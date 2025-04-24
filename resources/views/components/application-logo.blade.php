@@ -1,0 +1,1 @@
+<img src="{{ asset('images/warung.png') }}" alt="Logo Warung Pak Jhon" {{ $attributes }}>
