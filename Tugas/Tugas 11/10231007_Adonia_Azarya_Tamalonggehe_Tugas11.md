@@ -25,29 +25,86 @@ Pada Tugas Pekan 11, fokus utama adalah mengimplementasikan sistem autentikasi (
 - Implementasi fitur inti #1 (sesuai kebutuhan mitra)
 - Integrasi frontend-backend untuk fitur yang sudah ada
 
-## Dokumentasi
+## Dokumentasi Web Sikma
 ---
 
-### **1. Halaman Login**
-![alt text](IMG-20250425-WA0004.jpg)
-- **Deskripsi**: Halaman login untuk akses ke aplikasi SIKMA.
-- **Fitur Utama**:
-  - Form input untuk **Username** dan **Password**, memastikan pengguna dapat masuk dengan akun mereka.
-  - Tombol **Login** untuk autentikasi serta opsi **Forgot Password?** untuk pemulihan akun.
-  - Link **Sign Up** untuk pengguna baru yang ingin mendaftar.
+### **1. Halaman Login (`/login`)**
+![alt text](Login.png)
+**Deskripsi:**
+- Tampilan ini adalah halaman login aplikasi Laravel.
+- Terdapat dua kolom input:
+  - **Email**: Pengguna memasukkan alamat email mereka.
+  - **Password**: Pengguna memasukkan kata sandi mereka.
+- Ada juga opsi "Ingat Saya" (Remember Me) untuk menyimpan sesi login.
+- Terdapat link "Lupa Password?" untuk mengarahkan pengguna ke halaman reset password.
+- Tombol "MASUK" digunakan untuk melakukan login.
+- Jika pengguna belum memiliki akun, ada link "Belum mempunyai akun?" yang mengarahkan ke halaman registrasi.
 
----
-
-### **2. Halaman Register**
-![alt text](IMG-20250425-WA0001.jpg)
-- **Deskripsi**: Halaman pendaftaran akun baru di SIKMA.
-- **Fitur Utama**:
-  - Input untuk **Email**, **Username**, dan **Password**, memastikan data pengguna baru tersimpan dengan baik.
-  - Tombol **Register** untuk membuat akun dan link **Sign In** bagi pengguna yang sudah memiliki akun.
 
 ---
 
-### **3. Dashboard Utama (Orders)**
+### **2. Halaman Register (`/register`)**
+![alt text](Regis.png)
+**Deskripsi:**
+- Tampilan ini adalah halaman pendaftaran akun baru.
+- Terdapat beberapa kolom input:
+  - **Nama**: Nama lengkap pengguna.
+  - **Email**: Alamat email pengguna.
+  - **Password**: Kata sandi yang akan digunakan.
+  - **Konfirmasi Password**: Pengguna diminta mengulangi kata sandi untuk memastikan kesesuaian.
+- Ada tombol "DAFTAR" untuk menyelesaikan proses pendaftaran.
+- Jika pengguna sudah memiliki akun, ada link "Sudah mempunyai akun?" yang mengarahkan kembali ke halaman login.
+
+
+---
+
+### **3. Halaman Forgot Password (`/forgot-password`)**
+![alt text](<Lupa Password.jpg>)
+**Deskripsi:**
+- Tampilan ini adalah halaman untuk meminta reset password.
+- Terdapat satu kolom input:
+  - **Email**: Pengguna memasukkan alamat email yang terdaftar.
+- Terdapat tombol "RESET PASSWORD" untuk mengirim permintaan reset password.
+- Ada pesan penjelasan bahwa pengguna akan menerima tautan melalui email untuk menyetel ulang kata sandi mereka.
+- Link "Back to Login" mengarahkan pengguna kembali ke halaman login.
+
+
+---
+
+### **4. Halaman Dashboard (`/dashboard`)**
+![alt text](<Berhasil login.png>)
+**Deskripsi:**
+- Tampilan ini adalah halaman utama setelah pengguna berhasil login.
+- Terdapat pesan selamat datang: "You're logged in!" (Anda telah masuk!).
+- Ada deskripsi singkat tentang aplikasi, seperti tujuan utama aplikasi (contoh: "Aplikasi ini dirancang untuk membantu mengelola...").
+- Judul halaman adalah "Dashboard".
+
+**Kegunaan:**
+Halaman ini memberikan akses ke fitur-fitur utama aplikasi dan menampilkan informasi penting bagi pengguna yang telah login.
+
+### **5. Tampilan Database (`Object Explorer`)**
+![alt text](<Data Postgre.png>)
+**Deskripsi:**
+- Ini adalah tampilan database dari aplikasi Laravel, kemungkinan menggunakan PostgreSQL sebagai sistem manajemen database.
+- Terdapat tabel-tabel yang tersedia dalam database, seperti:
+  - `users`: Menyimpan data pengguna (id, nama, email, password, dll.).
+  - `games`, `genres`, `feedback`, dll.: Tabel-tabel lain yang mendukung fitur aplikasi.
+- Tampilan ini juga menunjukkan query SQL yang digunakan untuk mengambil data dari tabel `users`:
+  ```sql
+  SELECT * FROM public.users ORDER BY id ASC;
+  ```
+- Data output menampilkan beberapa baris dari tabel `users`, termasuk:
+  - `id`: ID unik pengguna.
+  - `name`: Nama pengguna.
+  - `email`: Email pengguna.
+  - `password`: Kata sandi yang telah dienkripsi.
+  - Kolom lain seperti `email_verified_at` dan `remember_token`.
+
+Pengujian integrasi terlihat dari interaksi antara frontend, backend, dan database dalam aplikasi SIKMA. Halaman Login , Register , dan Forgot Password menunjukkan bahwa frontend berhasil berkomunikasi dengan backend untuk memproses data pengguna dan mengelolanya di database PostgreSQL (tabel users). Data seperti nama, email, dan password disimpan serta diverifikasi melalui backend. Pada halaman Dashboard , informasi pengguna ditampilkan setelah login, membuktikan bahwa frontend mengambil data dari backend yang terhubung ke database.
+
+## Desain Figma Sikma
+
+### **1. Dashboard Utama (Orders)**
 ![alt text](IMG-20250425-WA0002.jpg)
 - **Deskripsi**: Dashboard utama untuk manajemen pesanan catering.
 - **Fitur Utama**:
@@ -56,7 +113,7 @@ Pada Tugas Pekan 11, fokus utama adalah mengimplementasikan sistem autentikasi (
 
 ---
 
-### **4. Dashboard Utama (Shipments)**
+### **2. Dashboard Utama (Shipments)**
 ![alt text](IMG-20250425-WA0003.jpg)
 - **Deskripsi**: Dashboard untuk memantau status pengiriman pesanan.
 - **Fitur Utama**:
@@ -66,7 +123,7 @@ Pada Tugas Pekan 11, fokus utama adalah mengimplementasikan sistem autentikasi (
 
 ---
 
-### **5. Dashboard Keuangan**
+### **3. Dashboard Keuangan**
 ![alt text](IMG-20250425-WA0007.jpg)
 - **Deskripsi**: Halaman laporan keuangan untuk analisis bisnis.
 - **Fitur Utama**:
@@ -76,7 +133,7 @@ Pada Tugas Pekan 11, fokus utama adalah mengimplementasikan sistem autentikasi (
 
 ---
 
-### **6. Manajemen Produk**
+### **4. Manajemen Produk**
 ![alt text](IMG-20250425-WA0008.jpg)
 - **Deskripsi**: Halaman untuk mengelola menu makanan yang disediakan.
 - **Fitur Utama**:
@@ -86,15 +143,13 @@ Pada Tugas Pekan 11, fokus utama adalah mengimplementasikan sistem autentikasi (
 
 ---
 
-### **7. Manajemen Pelanggan**
+### **5. Manajemen Pelanggan**
 ![alt text](IMG-20250425-WA0005.jpg)
 - **Deskripsi**: Halaman untuk mengelola data pelanggan.
 - **Fitur Utama**:
   - Daftar pelanggan mencakup **Nama Pelanggan**, **ID Pelanggan**, **Email**, **Alamat**, dan status **Aktif/Nonaktif**.
   - Fitur pencarian dan filter berdasarkan nama pelanggan atau lokasi.
   - Opsi **Edit** dan **Hapus** untuk memperbarui atau menghapus data pelanggan.
-
-Bukti pengujian integrasi menunjukkan bahwa frontend dan backend SIKMA telah terhubung dengan baik melalui API. Halaman seperti **Dashboard Orders**, **Manajemen Produk**, **Manajemen Pelanggan**, dan **Shipments** berhasil menampilkan data dari database, seperti pesanan, produk, pelanggan, serta informasi pengiriman (alamat, waktu, dan status). Selain itu, fungsionalitas tambahan seperti tombol **Chat**, fitur pencarian, filter, dan navigasi antar halaman berjalan sesuai harapan. Ini membuktikan bahwa semua komponen aplikasi bekerja secara terintegrasi dan mendukung operasional yang efisien.
 
 ---
 
