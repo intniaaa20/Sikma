@@ -26,15 +26,21 @@ class MenuResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\TagsInput::make('categories')
+                    ->label('Kategori')
+                    ->placeholder('Contoh: ayam, nasi, sambal')
+                    ->suggestions(['ayam', 'nasi', 'sambal', 'minuman', 'sayur', 'ikan', 'daging', 'mie', 'cemilan']),
                 Forms\Components\Textarea::make('description')
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('price')
                     ->required()
                     ->numeric()
-                    ->prefix('$'),
+                    ->prefix('Rp'),
                 Forms\Components\Toggle::make('is_available')
                     ->required(),
-                Forms\Components\DateTimePicker::make('archived_at'),
+                Forms\Components\FileUpload::make('image')
+                    ->image()
+                    ->directory('menu-images'),
             ]);
     }
 
@@ -45,13 +51,11 @@ class MenuResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
-                    ->money()
+                    ->money('IDR')
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_available')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('archived_at')
-                    ->dateTime()
-                    ->sortable(),
+                Tables\Columns\ImageColumn::make('image'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

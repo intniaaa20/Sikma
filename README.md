@@ -27,5 +27,10 @@ Setelah instalasi selesai, ikuti langkah berikut untuk menjalankan aplikasi:
 
 Aplikasi Anda sekarang seharusnya dapat diakses di `http://127.0.0.1:8000` (atau alamat lain yang ditampilkan oleh `php artisan serve`).
 
+### Update Fitur Tambahan
+
+1. **Menambahkan fitur  CRUD:** <br>
+Dalam Project Kali ini kami menambahkan fitur baru yaitu fungsi CRUD di dalam form login/register
+
 ---
-*project ini masih dalam pegembangan dan masih banyak yang kurang*
+## *project ini masih dalam tahap pegembangan dan masih banyak yang harus ditambahkan* ##

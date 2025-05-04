@@ -1,0 +1,49 @@
+@import "../../../../vendor/filament/filament/resources/css/theme.css";
+
+@config 'tailwind.config.js';
+
+/* Custom Sidebar Styles */
+
+/* Apply background to the main navigation area within the sidebar */
+nav.fi-sidebar-nav {
+    @apply bg-gray-50 dark:bg-gray-800/50 h-full px-0 pt-4; /* Light gray background, full height, remove horizontal padding, add top padding */
+}
+
+/* Ensure the outer container matches if needed, or is transparent */
+.fi-main-sidebar-ctn {
+    @apply bg-gray-50 dark:bg-gray-900; /* Match sidebar nav background */
+}
+
+/* Adjust Logo background if needed (already set to white in layout, should be fine) */
+/* .fi-main-sidebar-ctn > div:first-child { ... } */
+
+/* Default state for sidebar item links */
+.fi-main-sidebar .fi-sidebar-item a {
+    @apply text-gray-700 rounded-lg mx-2 px-2 py-2.5; /* Darker text, rounded, padding */
+    /* transition: background-color 0.2s ease-in-out; Optional transition */
+}
+
+/* Hover state for non-active sidebar item links */
+.fi-main-sidebar .fi-sidebar-item:not(.fi-active) a:hover {
+    @apply bg-gray-100 dark:bg-gray-800;
+}
+
+/* Active sidebar item container */
+.fi-main-sidebar .fi-sidebar-item.fi-active {
+    @apply bg-pakjhon-500 rounded-lg mx-2;
+}
+
+/* Active sidebar item link text */
+.fi-main-sidebar .fi-sidebar-item.fi-active a span {
+    @apply text-white font-semibold;
+}
+
+/* Active sidebar item link icon */
+.fi-main-sidebar .fi-sidebar-item.fi-active a svg {
+    @apply text-white;
+}
+
+/* Remove hover effect from active item link itself */
+.fi-main-sidebar .fi-sidebar-item.fi-active a:hover {
+    @apply bg-transparent;
+}

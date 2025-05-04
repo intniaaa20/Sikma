@@ -1,25 +1,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-.interactive-logo-canvas {
-    /* Hapus position: absolute dan properti terkait (top, left, transform, z-index) */
-    /* Biarkan width dan height untuk ukuran canvas */
-    width: 500px;
-    height: 400px;
-    pointer-events: none; /* Tetap pertahankan agar tidak mengganggu klik */
-}
-
-/* CSS untuk elemen cermin caret */
-.caret-mirror-div {
-    position: absolute;
-    top: 0;
-    left: -9999px; /* Sembunyikan di luar layar */
-    white-space: pre-wrap; /* Cocokkan dengan input */
-    word-wrap: break-word; /* Cocokkan dengan input */
-    overflow: hidden; /* Hindari scrollbar */
-    padding: 0;
-    margin: 0;
-    border: 0;
-    visibility: hidden; /* Pastikan tidak terlihat */
-}
