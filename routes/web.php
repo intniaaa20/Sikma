@@ -1,15 +1,20 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+<<<<<<< HEAD
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Menu; // Pastikan Model Menu di-import
+=======
+use Illuminate\Support\Facades\Route;
+>>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+<<<<<<< HEAD
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
@@ -49,3 +54,16 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+=======
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
+>>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6

@@ -26,21 +26,31 @@ class MenuResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+<<<<<<< HEAD
                 Forms\Components\TagsInput::make('categories')
                     ->label('Kategori')
                     ->placeholder('Contoh: ayam, nasi, sambal')
                     ->suggestions(['ayam', 'nasi', 'sambal', 'minuman', 'sayur', 'ikan', 'daging', 'mie', 'cemilan']),
+=======
+>>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
                 Forms\Components\Textarea::make('description')
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('price')
                     ->required()
                     ->numeric()
+<<<<<<< HEAD
                     ->prefix('Rp'),
                 Forms\Components\Toggle::make('is_available')
                     ->required(),
                 Forms\Components\FileUpload::make('image')
                     ->image()
                     ->directory('menu-images'),
+=======
+                    ->prefix('$'),
+                Forms\Components\Toggle::make('is_available')
+                    ->required(),
+                Forms\Components\DateTimePicker::make('archived_at'),
+>>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
             ]);
     }
 
@@ -51,11 +61,21 @@ class MenuResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
+<<<<<<< HEAD
                     ->money('IDR')
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_available')
                     ->boolean(),
                 Tables\Columns\ImageColumn::make('image'),
+=======
+                    ->money()
+                    ->sortable(),
+                Tables\Columns\IconColumn::make('is_available')
+                    ->boolean(),
+                Tables\Columns\TextColumn::make('archived_at')
+                    ->dateTime()
+                    ->sortable(),
+>>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

@@ -17,10 +17,13 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+<<<<<<< HEAD
 use Illuminate\Contracts\View\View;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Middleware\CheckAdminRole;
+=======
+>>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -32,10 +35,15 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->colors([
+<<<<<<< HEAD
                 // 'primary' => Color::Amber, // Keep the color from config/filament.php
             ])
             ->brandLogo(fn(): View => view('filament.custom-brand'))
             ->brandLogoHeight('3rem') // Adjust height for the combined element if needed
+=======
+                'primary' => Color::Amber,
+            ])
+>>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -59,7 +67,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+<<<<<<< HEAD
                 CheckAdminRole::class,
+=======
+>>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
             ]);
     }
 }
