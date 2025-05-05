@@ -1,5 +1,2 @@
-POST http://localhost:8000/cart/update/1
-Content-Type: application/x-www-form-urlencoded
-X-CSRF-TOKEN: eyJpdiI6Ikp...
-
-qty=2
+git config --global user.name "Betran23"
+git config --global user.email "10231023@student.itk.ac.id"

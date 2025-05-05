@@ -91,37 +91,42 @@
                                 <span x-show="sidebarOpen" class="transition-all duration-200">Product</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="/cart"
-                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('cart')) bg-yellow-400 text-white @endif sidebar-cart-hover">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-yellow-600 flex-shrink-0">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                                </svg>
-                                <span x-show="sidebarOpen" class="transition-all duration-200">Cart</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/order"
-                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('order')) bg-yellow-400 text-white @endif sidebar-anim-hover">
-                                <svg class="w-5 h-5 text-yellow-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path
-                                        d="M16 6V4a2 2 0 00-2-2H6a2 2 0 00-2 2v2H2v2h1v8a2 2 0 002 2h10a2 2 0 002-2V8h1V6h-3zm-2 0H6V4h8v2z" />
-                                </svg>
-                                <span x-show="sidebarOpen" class="transition-all duration-200">Order</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/history"
-                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('history')) bg-yellow-400 text-white @endif sidebar-anim-hover">
-                                <svg class="w-5 h-5 text-yellow-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path
-                                        d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 8V6a1 1 0 10-2 0v5a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414l-2.707-2.707z" />
-                                </svg>
-                                <span x-show="sidebarOpen" class="transition-all duration-200">History</span>
-                            </a>
-                        </li>
+                        @if (!auth()->user()->hasRole('admin'))
+                            <li>
+                                <a href="/cart"
+                                    class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('cart')) bg-yellow-400 text-white @endif sidebar-cart-hover sidebar-anim-hover">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor"
+                                        class="w-5 h-5 text-yellow-600 flex-shrink-0">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                    </svg>
+                                    <span x-show="sidebarOpen" class="transition-all duration-200">Cart</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/order"
+                                    class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('order')) bg-yellow-400 text-white @endif sidebar-anim-hover">
+                                    <svg class="w-5 h-5 text-yellow-600 flex-shrink-0" fill="currentColor"
+                                        viewBox="0 0 20 20">
+                                        <path
+                                            d="M16 6V4a2 2 0 00-2-2H6a2 2 0 00-2 2v2H2v2h1v8a2 2 0 002 2h10a2 2 0 002-2V8h1V6h-3zm-2 0H6V4h8v2z" />
+                                    </svg>
+                                    <span x-show="sidebarOpen" class="transition-all duration-200">Order</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/history"
+                                    class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('history')) bg-yellow-400 text-white @endif sidebar-anim-hover">
+                                    <svg class="w-5 h-5 text-yellow-600 flex-shrink-0" fill="currentColor"
+                                        viewBox="0 0 20 20">
+                                        <path
+                                            d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 8V6a1 1 0 10-2 0v5a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414l-2.707-2.707z" />
+                                    </svg>
+                                    <span x-show="sidebarOpen" class="transition-all duration-200">History</span>
+                                </a>
+                            </li>
+                        @endif
                         <li>
                             <a href="/message"
                                 class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('message')) bg-yellow-400 text-white @endif sidebar-anim-hover">

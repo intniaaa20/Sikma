@@ -77,6 +77,7 @@
                                     d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </a>
+                        @if (!auth()->user() || !auth()->user()->hasRole('admin'))
                         <form action="{{ route('cart.add', ['menu' => $menu->id]) }}" method="POST">
                             @csrf
                             <button type="submit"
@@ -85,6 +86,7 @@
                                 +
                             </button>
                         </form>
+                        @endif
                     </div>
                 </div>
                 @if (!empty($menu->categories) && is_array($menu->categories) && count($menu->categories) > 0)

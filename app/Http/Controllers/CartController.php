@@ -22,16 +22,21 @@ class CartController extends Controller
     public function index(Request $request)
     {
         $cart = session()->get('cart', []);
-        $menus = Menu::whereIn('id', array_keys($cart))->get();
+        $cart = is_array($cart) ? $cart : [];
+        $menus = \App\Models\Menu::whereIn('id', array_keys($cart))->get();
         return view('cart.index', compact('menus', 'cart'));
     }
 
     public function add(Request $request, Menu $menu)
     {
         $cart = session()->get('cart', []);
-        $cart[$menu->id] = ($cart[$menu->id] ?? 0) + 1;
+        // Pastikan $cart selalu array asosiatif id menu => qty
+        if (!is_array($cart)) {
+            $cart = [];
+        }
+        $menuId = (string) $menu->id;
+        $cart[$menuId] = isset($cart[$menuId]) ? $cart[$menuId] + 1 : 1;
         session(['cart' => $cart]);
-        // Sinkron ke database
         $this->syncCartToDatabase($cart);
         return back()->with('success', 'Menu berhasil ditambahkan ke keranjang!');
     }
