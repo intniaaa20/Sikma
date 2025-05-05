@@ -4,11 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
     "content-hash": "e658d9656a70bd86787fbbcb8d8b882d",
-=======
-    "content-hash": "6cfe92caf488fd4a309e672230d02582",
->>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -4894,7 +4890,6 @@
             "time": "2025-04-11T15:27:14+00:00"
         },
         {
-<<<<<<< HEAD
             "name": "spatie/laravel-permission",
             "version": "6.17.0",
             "source": {
@@ -4978,8 +4973,6 @@
             "time": "2025-04-08T15:06:14+00:00"
         },
         {
-=======
->>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
             "name": "symfony/clock",
             "version": "v7.2.0",
             "source": {

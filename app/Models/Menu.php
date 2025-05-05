@@ -2,15 +2,13 @@
 
 namespace App\Models;
 
-<<<<<<< HEAD
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-=======
->>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
+
 use Illuminate\Database\Eloquent\Model;
 
 class Menu extends Model
 {
-<<<<<<< HEAD
+
     use HasFactory;
 
     /**
@@ -30,7 +28,4 @@ class Menu extends Model
     protected $casts = [
         'categories' => 'array',
     ];
-=======
-    //
->>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
 }

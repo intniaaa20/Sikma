@@ -29,9 +29,13 @@ class OrderResource extends Resource
                 Forms\Components\TextInput::make('total')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('status')
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'sending' => 'Sending',
+                        'done' => 'Done',
+                    ])
                     ->required()
-                    ->maxLength(255)
                     ->default('pending'),
             ]);
     }

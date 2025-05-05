@@ -25,7 +25,6 @@
                                 <th scope="col" class="text-start">Harga</th>
                                 <th scope="col" class="text-center">Jumlah</th>
                                 <th scope="col" class="text-end">Subtotal</th>
-                                <th scope="col" class="text-end">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -12,7 +12,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @forelse ($menus as $menu)
             <a href="{{ route('menu.show', $menu->id) }}"
-                class="block bg-white rounded shadow p-4 flex flex-col hover:shadow-lg transition group">
+                class="block bg-white rounded shadow p-4 flex flex-col hover:shadow-lg transition group hover:scale-[1.03] hover:bg-yellow-50 hover:border-yellow-300 border border-transparent duration-200 cursor-pointer">
                 @if ($menu->image)
                     <img src="{{ url('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
                         class="w-full h-40 object-cover rounded mb-3 group-hover:opacity-80 transition">
@@ -21,7 +21,17 @@
                         ada gambar</div>
                 @endif
                 <h2 class="font-semibold text-lg mb-1 group-hover:text-yellow-600 transition">{{ $menu->name }}</h2>
-                <p class="text-gray-600 text-sm mb-2 flex-grow">{{ $menu->description ?? 'Tidak ada deskripsi.' }}</p>
+                <p class="text-gray-600 text-sm mb-2 flex-grow">
+                    @php
+                        // Cek jika deskripsi mengandung tag <ul> atau <ol>, tampilkan sebagai HTML
+                        $desc = $menu->description ?? 'Tidak ada deskripsi.';
+                    @endphp
+                    @if (Str::contains($desc, ['<ul', '<ol', '<li']))
+                        {!! $desc !!}
+                    @else
+                        {{ $desc }}
+                    @endif
+                </p>
                 <div class="flex items-center justify-between mt-auto gap-2">
                     <span class="text-primary font-bold">Rp {{ number_format($menu->price, 0, ',', '.') }}</span>
                     <div class="flex gap-1">
@@ -55,4 +65,33 @@
             <div class="col-span-4 text-center text-gray-500">Belum ada produk yang tersedia saat ini.</div>
         @endforelse
     </div>
+    <style>
+        .sidebar-anim-hover {
+            transition: background 0.22s, color 0.18s, transform 0.18s;
+        }
+
+        .sidebar-anim-hover:hover {
+            background: #fef08a !important;
+            color: #d97706 !important;
+            transform: scale(1.04) translateX(4px);
+            box-shadow: 0 2px 12px 0 #fde04733;
+            font-weight: bold;
+        }
+
+        .group:hover .group-hover\:text-yellow-600 {
+            color: #ca8a04 !important;
+        }
+
+        .group:hover .group-hover\:opacity-80 {
+            opacity: 0.8 !important;
+        }
+
+        .group:hover .group-hover\:scale-110 {
+            transform: scale(1.10) !important;
+        }
+
+        .group:hover .group-hover\:bg-yellow-200 {
+            background-color: #fef08a !important;
+        }
+    </style>
 @endsection

@@ -1,0 +1,5 @@
+POST http://localhost:8000/cart/update/1
+Content-Type: application/x-www-form-urlencoded
+X-CSRF-TOKEN: eyJpdiI6Ikp...
+
+qty=2

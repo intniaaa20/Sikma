@@ -1,5 +1,4 @@
 <x-guest-layout>
-<<<<<<< HEAD
     {{-- Remove Old Logo Placeholder --}}
     {{-- ... (removed comments if any) ... --}}
 
@@ -13,63 +12,37 @@
     <p class="text-center text-gray-600 mb-6">Selamat datang di SIKMA</p>
 
     <form method="POST" action="{{ route('register') }}" class="space-y-6">
-=======
-    <form method="POST" action="{{ route('register') }}">
->>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
         @csrf
 
         <!-- Name -->
         <div>
-<<<<<<< HEAD
             {{-- <x-input-label for="name" :value="__('Nama')" /> --}}
             <x-text-input id="name"
                 class="block w-full rounded-full px-4 py-2 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
                 type="text" name="name" :value="old('name')" required autofocus autocomplete="name"
                 placeholder="Nama Lengkap" />
-=======
-            <x-input-label for="name" :value="__('Nama')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required
-                autofocus autocomplete="name" />
->>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
 
         <!-- Email Address -->
-<<<<<<< HEAD
         <div>
             {{-- <x-input-label for="email" :value="__('Email')" /> --}}
             <x-text-input id="email"
                 class="block w-full rounded-full px-4 py-2 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
                 type="email" name="email" :value="old('email')" required autocomplete="username" placeholder="Email" />
-=======
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')"
-                required autocomplete="username" />
->>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <!-- Password -->
-<<<<<<< HEAD
         <div>
             {{-- <x-input-label for="password" :value="__('Password')" /> --}}
             <x-text-input id="password"
                 class="block w-full rounded-full px-4 py-2 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
                 type="password" name="password" required autocomplete="new-password" placeholder="Password" />
-=======
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required
-                autocomplete="new-password" />
-
->>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
         <!-- Confirm Password -->
-<<<<<<< HEAD
         <div>
             {{-- <x-input-label for="password_confirmation" :value="__('Konfirmasi Password')" /> --}}
             <x-text-input id="password_confirmation"
@@ -81,10 +54,13 @@
 
         <!-- Register Button -->
         <div>
-            <x-primary-button
-                class="w-full justify-center rounded-full py-3 bg-orange-500 hover:bg-orange-600 focus:bg-orange-700 active:bg-orange-800 text-white font-semibold">
+            <button type="submit"
+                class="w-full flex justify-center items-center gap-2 rounded-full py-3 bg-gradient-to-r from-orange-400 to-yellow-400 hover:from-orange-500 hover:to-yellow-500 focus:bg-orange-700 active:bg-orange-800 text-white font-bold text-lg shadow-lg transition-all duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7-7l7 7-7 7" />
+                </svg>
                 {{ __('Register') }}
-            </x-primary-button>
+            </button>
         </div>
 
         {{-- Login Link --}}
@@ -96,26 +72,6 @@
                     {{ __('Masuk di sini') }}
                 </a>
             </p>
-=======
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Konfirmasi Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password"
-                name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                href="{{ route('login') }}">
-                {{ __('Sudah mempunyai akun?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Daftar') }}
-            </x-primary-button>
->>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
         </div>
     </form>
 </x-guest-layout>

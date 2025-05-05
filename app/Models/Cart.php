@@ -12,17 +12,12 @@ class Cart extends Model
 
     protected $fillable = [
         'user_id',
-        'menu_id',
-        'quantity',
+        'items',
     ];
 
-    /**
-     * Get the menu that owns the cart item.
-     */
-    public function menu(): BelongsTo
-    {
-        return $this->belongsTo(Menu::class);
-    }
+    protected $casts = [
+        'items' => 'array',
+    ];
 
     /**
      * Get the user that owns the cart item.

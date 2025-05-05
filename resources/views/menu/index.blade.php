@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 @extends('layouts.app')
 
 @section('content')
@@ -43,33 +42,48 @@
     @endif
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @forelse ($menus as $menu)
-            <div class="bg-white rounded shadow p-4 flex flex-col">
+            <div
+                class="bg-white rounded shadow p-4 flex flex-col transition-all duration-200 cursor-pointer hover:shadow-lg hover:scale-[1.03] hover:bg-yellow-50 hover:border-yellow-300 border border-transparent group">
                 @if ($menu->image)
                     <img src="{{ url('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
-                        class="w-full h-40 object-cover rounded mb-3">
+                        class="w-full h-40 object-cover rounded mb-3 group-hover:opacity-80 transition">
                 @else
                     <div class="w-full h-40 flex items-center justify-center bg-gray-100 rounded mb-3 text-gray-400">Tidak
                         ada gambar</div>
                 @endif
-                <h2 class="font-semibold text-lg mb-1">{{ $menu->name }}</h2>
-                <p class="text-gray-600 text-sm mb-2 flex-grow">{{ $menu->description ?? 'Tidak ada deskripsi.' }}</p>
+                <h2 class="font-semibold text-lg mb-1 group-hover:text-yellow-600 transition">{{ $menu->name }}</h2>
+                <p class="text-gray-600 text-sm mb-2 flex-grow">
+                    <span class="menu-desc block" style="max-height: 3.6em; overflow: hidden;"
+                        id="desc-{{ $menu->id }}">{!! nl2br(e($menu->description ?? 'Tidak ada deskripsi.')) !!}</span>
+                    @if ($menu->description && strlen($menu->description) > 80)
+                        <button type="button" class="text-yellow-600 hover:underline text-xs font-semibold mt-1"
+                            onclick="toggleDesc({{ $menu->id }})" id="btn-desc-{{ $menu->id }}">Show more</button>
+                    @endif
+                </p>
                 <div class="flex items-center justify-between mt-auto">
                     <span class="text-primary font-bold">Rp {{ number_format($menu->price, 0, ',', '.') }}</span>
-                    <div class="flex gap-1">
+                    <div class="flex gap-2">
                         <a href="{{ route('menu.show', $menu->id) }}"
-                            class="inline-flex items-center justify-center w-8 h-8 rounded bg-yellow-100 hover:bg-yellow-200 text-yellow-700"
+                            class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 text-yellow-900 shadow-lg border-2 border-yellow-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-400 group"
                             title="Lihat Detail">
+                            <span class="sr-only">Lihat Detail</span>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                                stroke="currentColor" class="w-5 h-5">
+                                stroke="currentColor"
+                                class="w-6 h-6 group-hover:scale-110 group-hover:text-orange-600 transition-transform duration-200">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
+                                    fill="#fff" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01" />
                                 <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </a>
                         <form action="{{ route('cart.add', ['menu' => $menu->id]) }}" method="POST">
                             @csrf
                             <button type="submit"
-                                class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded">+
-                                Tambah</button>
+                                class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white shadow-lg border-2 border-blue-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 text-xl font-bold transform hover:scale-110 hover:rotate-6"
+                                title="Tambah Ke menu">
+                                +
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -86,51 +100,42 @@
         @endforelse
     </div>
 @endsection
-=======
-<x-app-layout>
-    {{-- Container sudah ada di app-layout --}}
-    <h1 class="h2 mb-4">Menu Kami</h1>
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
+@section('scripts')
+    <script>
+        function toggleDesc(id) {
+            const desc = document.getElementById('desc-' + id);
+            const btn = document.getElementById('btn-desc-' + id);
+            if (desc.style.maxHeight === 'none') {
+                desc.style.maxHeight = '3.6em';
+                desc.style.overflow = 'hidden';
+                btn.textContent = 'Show more';
+            } else {
+                desc.style.maxHeight = 'none';
+                desc.style.overflow = 'visible';
+                btn.textContent = 'Show less';
+            }
+        }
+    </script>
+    <style>
+        .sidebar-anim-hover {
+            transition: background 0.22s, color 0.18s, transform 0.18s;
+        }
 
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-        @forelse ($menus as $menu)
-            <div class="col">
-                <div class="card h-100 shadow-sm">
-                    {{-- Placeholder for image --}}
-                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
-                        style="height: 180px;">
-                        <span class="text-muted">Image Placeholder</span>
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title mb-1">{{ $menu->name }}</h5>
-                        <p class="card-text text-muted small mb-2 flex-grow-1">
-                            {{ $menu->description ?? 'Tidak ada deskripsi.' }}
-                        </p>
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="fw-bold text-primary fs-5">
-                                Rp {{ number_format($menu->price, 0, ',', '.') }}
-                            </span>
-                        </div>
-                        <form action="{{ route('cart.add', $menu) }}" method="POST" class="mt-auto">
-                            @csrf
-                            <button type="submit" class="btn btn-primary w-100">
-                                Tambah ke Keranjang
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        @empty
-            <div class="col-12">
-                <p class="text-center text-muted">Belum ada menu yang tersedia saat ini.</p>
-            </div>
-        @endforelse
-    </div>
-</x-app-layout>
->>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
+        .sidebar-anim-hover:hover {
+            background: #fef08a !important;
+            color: #d97706 !important;
+            transform: scale(1.04) translateX(4px);
+            box-shadow: 0 2px 12px 0 #fde04733;
+            font-weight: bold;
+        }
+
+        .group:hover .group-hover\:text-yellow-600 {
+            color: #ca8a04 !important;
+        }
+
+        .group:hover .group-hover\:opacity-80 {
+            opacity: 0.8 !important;
+        }
+    </style>
+@endsection

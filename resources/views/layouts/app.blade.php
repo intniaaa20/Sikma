@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<<<<<<< HEAD
 
 <head>
     <meta charset="utf-8">
@@ -9,7 +8,19 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        body,
+        html,
+        * {
+            font-family: 'Poppins', sans-serif !important;
+        }
+    </style>
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -33,7 +44,7 @@
         <!-- Sidebar -->
         <aside :class="sidebarOpen ? 'w-72' : 'w-20'"
             class="transition-all duration-300 bg-gradient-to-b from-yellow-400 via-yellow-200 to-yellow-50 shadow-md h-screen flex flex-col relative group z-50"
-            x-data="{ sidebarOpen: JSON.parse(localStorage.getItem('sidebarOpen') ?? 'true') }" x-init="$watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val))">
+            style="position: sticky; top: 0; height: 100vh;" x-data="{ sidebarOpen: JSON.parse(localStorage.getItem('sidebarOpen') ?? 'true') }" x-init="$watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val))">
             <!-- Toggle Button -->
             <button @click="sidebarOpen = !sidebarOpen"
                 class="absolute top-4 right-[-14px] z-50 bg-yellow-400 border border-yellow-500 rounded-full w-7 h-7 flex items-center justify-center shadow hover:bg-yellow-300 transition">
@@ -46,7 +57,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
             </button>
-            <div class="flex items-center gap-3 p-6 border-b bg-white/80" :class="sidebarOpen ? '' : 'justify-center'">
+            <div class="flex items-center gap-3 p-6 border-b bg-white/80" :class="sidebarOpen ? '' : 'justify-center'"
+                style="font-family: 'Poppins', sans-serif;">
                 <img src="/images/logo.png" alt="Pak Jhon"
                     class="w-14 h-14 rounded-full object-cover object-center aspect-square border-4 border-yellow-400 shadow">
                 <template x-if="sidebarOpen">
@@ -61,7 +73,7 @@
                     @auth
                         <li>
                             <a href="/"
-                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('/')) bg-yellow-400 text-white @endif">
+                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('/')) bg-yellow-400 text-white @endif sidebar-anim-hover">
                                 <svg class="w-5 h-5 text-yellow-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path
                                         d="M10.707 2.293a1 1 0 00-1.414 0l-7 7A1 1 0 003 11h1v6a1 1 0 001 1h3a1 1 0 001-1v-3h2v3a1 1 0 001 1h3a1 1 0 001-1v-6h1a1 1 0 00.707-1.707l-7-7z" />
@@ -71,7 +83,7 @@
                         </li>
                         <li>
                             <a href="/menu"
-                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('menu')) bg-yellow-400 text-white @endif">
+                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('menu')) bg-yellow-400 text-white @endif sidebar-anim-hover">
                                 <svg class="w-5 h-5 text-yellow-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path
                                         d="M4 3a1 1 0 000 2h12a1 1 0 100-2H4zm0 4a1 1 0 000 2h12a1 1 0 100-2H4zm0 4a1 1 0 000 2h12a1 1 0 100-2H4zm0 4a1 1 0 000 2h12a1 1 0 100-2H4z" />
@@ -81,19 +93,18 @@
                         </li>
                         <li>
                             <a href="/cart"
-                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('chart')) bg-yellow-400 text-white @endif">
+                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('cart')) bg-yellow-400 text-white @endif sidebar-cart-hover">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-yellow-600 flex-shrink-0">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                                 </svg>
-
-                                <span x-show="sidebarOpen" class="transition-all duration-200">Chart</span>
+                                <span x-show="sidebarOpen" class="transition-all duration-200">Cart</span>
                             </a>
                         </li>
                         <li>
                             <a href="/order"
-                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('order')) bg-yellow-400 text-white @endif">
+                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('order')) bg-yellow-400 text-white @endif sidebar-anim-hover">
                                 <svg class="w-5 h-5 text-yellow-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path
                                         d="M16 6V4a2 2 0 00-2-2H6a2 2 0 00-2 2v2H2v2h1v8a2 2 0 002 2h10a2 2 0 002-2V8h1V6h-3zm-2 0H6V4h8v2z" />
@@ -103,7 +114,7 @@
                         </li>
                         <li>
                             <a href="/history"
-                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('history')) bg-yellow-400 text-white @endif">
+                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('history')) bg-yellow-400 text-white @endif sidebar-anim-hover">
                                 <svg class="w-5 h-5 text-yellow-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path
                                         d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 8V6a1 1 0 10-2 0v5a1 1 0 00.293.707l3 3a1 1 0 001.414-1.414l-2.707-2.707z" />
@@ -113,7 +124,7 @@
                         </li>
                         <li>
                             <a href="/message"
-                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('message')) bg-yellow-400 text-white @endif">
+                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('message')) bg-yellow-400 text-white @endif sidebar-anim-hover">
                                 <svg class="w-5 h-5 text-yellow-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H6l-4 4V5z" />
                                 </svg>
@@ -123,8 +134,9 @@
                     @else
                         <li>
                             <a href="/"
-                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('/')) bg-yellow-400 text-white @endif">
-                                <svg class="w-5 h-5 text-yellow-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                class="flex items-center gap-3 px-4 py-3 rounded-lg font-semibold text-gray-700 hover:bg-yellow-200 transition @if (request()->is('/')) bg-yellow-400 text-white @endif sidebar-anim-hover">
+                                <svg class="w-5 h-5 text-yellow-600 flex-shrink-0" fill="currentColor"
+                                    viewBox="0 0 20 20">
                                     <path
                                         d="M10.707 2.293a1 1 0 00-1.414 0l-7 7A1 1 0 003 11h1v6a1 1 0 001 1h3a1 1 0 001-1v-3h2v3a1 1 0 001 1h3a1 1 0 001-1v-6h1a1 1 0 00.707-1.707l-7-7z" />
                                 </svg>
@@ -220,7 +232,24 @@
                             });
                         </script>
                     @else
-                        <a href="{{ route('login') }}" class="text-sm bg-blue-500 text-white px-3 py-1 rounded">Login</a>
+                        <a href="{{ route('login') }}"
+                            class="text-sm bg-gradient-to-r from-orange-400 to-yellow-400 hover:from-orange-500 hover:to-yellow-500 text-white px-5 py-2 rounded-full font-bold shadow-lg transition-all duration-200 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 12h14m-7-7l7 7-7 7" />
+                            </svg>
+                            Login
+                        </a>
+                        <a href="{{ route('register') }}"
+                            class="text-sm bg-white/80 hover:bg-yellow-100 text-yellow-700 px-5 py-2 rounded-full font-bold shadow-lg transition-all duration-200 border border-yellow-300 ml-2 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            Register
+                        </a>
                     @endauth
                 </div>
             </header>
@@ -258,42 +287,34 @@
             background: #fde047;
             border-radius: 8px;
         }
+
+        /* Animasi hover pada menu cart di sidebar */
+        .sidebar-cart-hover {
+            transition: background 0.22s, color 0.18s, transform 0.18s;
+        }
+
+        .sidebar-cart-hover:hover {
+            background: #fef08a !important;
+            color: #d97706 !important;
+            transform: scale(1.04) translateX(4px);
+            box-shadow: 0 2px 12px 0 #fde04733;
+            font-weight: bold;
+        }
+
+        /* Animasi hover pada semua menu sidebar */
+        .sidebar-anim-hover {
+            transition: background 0.22s, color 0.18s, transform 0.18s;
+        }
+
+        .sidebar-anim-hover:hover {
+            background: #fef08a !important;
+            color: #d97706 !important;
+            transform: scale(1.04) translateX(4px);
+            box-shadow: 0 2px 12px 0 #fde04733;
+            font-weight: bold;
+        }
     </style>
+    @yield('scripts')
 </body>
 
-=======
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-
-        <title>{{ config('app.name', 'Laravel') }}</title>
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
-
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
-
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
-        </div>
-    </body>
->>>>>>> 11bef3afaaf72c1e50919d38cee6d046b0ef42c6
 </html>
