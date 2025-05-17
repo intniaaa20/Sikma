@@ -3,13 +3,18 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Menu; // Pastikan Model Menu di-import
-
+use Spatie\Permission\Middlewares\RoleMiddleware as SpatieRoleMiddleware;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Route untuk menerima notifikasi dari Midtrans (webhook), tidak perlu auth
+Route::post('/midtrans/notification', [CartController::class, 'midtransNotification']);
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
@@ -53,7 +58,19 @@ Route::middleware('auth')->group(function () {
         Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
         Route::post('/checkout/process', [CartController::class, 'processCheckout'])->name('checkout.process');
         Route::post('/cart/delete-selected', [CartController::class, 'deleteSelected'])->name('cart.deleteSelected');
+        Route::get('/checkout/midtrans/{order}', [CartController::class, 'showMidtransPayment'])->name('checkout.midtrans');
     });
+
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/history', [OrderController::class, 'history'])->name('orders.history');
+
+    Route::get('/messages', [\App\Http\Controllers\MessageController::class, 'index'])->name('messages.index');
+    Route::post('/messages', [\App\Http\Controllers\MessageController::class, 'store'])->name('messages.store');
+});
+
+// Ganti middleware admin dengan pengecekan manual di controller jika 'role' tidak tersedia
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/order-history', [OrderController::class, 'adminOrderHistory'])->name('admin.order-history');
 });
 
 require __DIR__ . '/auth.php';

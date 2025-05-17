@@ -74,7 +74,7 @@
                 </svg>
                 Kembali ke Daftar Menu
             </a>
-            @if ($menu->is_available)
+            @if ($menu->is_available && (!auth()->user() || !auth()->user()->hasRole('admin')))
                 <form method="POST" action="{{ route('cart.add', $menu->id) }}" class="flex items-center gap-2">
                     @csrf
                     <button type="submit"

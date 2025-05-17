@@ -52,14 +52,14 @@
                         ada gambar</div>
                 @endif
                 <h2 class="font-semibold text-lg mb-1 group-hover:text-yellow-600 transition">{{ $menu->name }}</h2>
-                <p class="text-gray-600 text-sm mb-2 flex-grow">
-                    <span class="menu-desc block" style="max-height: 3.6em; overflow: hidden;"
-                        id="desc-{{ $menu->id }}">{!! nl2br(e($menu->description ?? 'Tidak ada deskripsi.')) !!}</span>
-                    @if ($menu->description && strlen($menu->description) > 80)
-                        <button type="button" class="text-yellow-600 hover:underline text-xs font-semibold mt-1"
-                            onclick="toggleDesc({{ $menu->id }})" id="btn-desc-{{ $menu->id }}">Show more</button>
-                    @endif
-                </p>
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-2 shadow-sm min-h-[60px] overflow-hidden transition-all duration-400"
+                    id="desc-{{ $menu->id }}">
+                    {!! nl2br(e($menu->description ?? 'Tidak ada deskripsi.')) !!}
+                </div>
+                @if ($menu->description && strlen($menu->description) > 80)
+                    <button type="button" class="text-yellow-600 hover:underline text-xs font-semibold mt-1"
+                        onclick="toggleDesc({{ $menu->id }})" id="btn-desc-{{ $menu->id }}">Show more</button>
+                @endif
                 <div class="flex items-center justify-between mt-auto">
                     <span class="text-primary font-bold">Rp {{ number_format($menu->price, 0, ',', '.') }}</span>
                     <div class="flex gap-2">
@@ -78,14 +78,14 @@
                             </svg>
                         </a>
                         @if (!auth()->user() || !auth()->user()->hasRole('admin'))
-                        <form action="{{ route('cart.add', ['menu' => $menu->id]) }}" method="POST">
-                            @csrf
-                            <button type="submit"
-                                class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white shadow-lg border-2 border-blue-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 text-xl font-bold transform hover:scale-110 hover:rotate-6"
-                                title="Tambah Ke menu">
-                                +
-                            </button>
-                        </form>
+                            <form action="{{ route('cart.add', ['menu' => $menu->id]) }}" method="POST">
+                                @csrf
+                                <button type="submit"
+                                    class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white shadow-lg border-2 border-blue-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 text-xl font-bold transform hover:scale-110 hover:rotate-6"
+                                    title="Tambah Ke menu">
+                                    +
+                                </button>
+                            </form>
                         @endif
                     </div>
                 </div>
@@ -106,18 +106,35 @@
 @section('scripts')
     <script>
         function toggleDesc(id) {
-            const desc = document.getElementById('desc-' + id);
-            const btn = document.getElementById('btn-desc-' + id);
-            if (desc.style.maxHeight === 'none') {
-                desc.style.maxHeight = '3.6em';
-                desc.style.overflow = 'hidden';
-                btn.textContent = 'Show more';
-            } else {
-                desc.style.maxHeight = 'none';
-                desc.style.overflow = 'visible';
-                btn.textContent = 'Show less';
-            }
+            document.querySelectorAll('[id^="desc-"]').forEach(function(desc) {
+                if (desc.id === 'desc-' + id) {
+                    // Toggle card yang diklik
+                    const btn = document.getElementById('btn-desc-' + id);
+                    if (!desc.style.maxHeight || desc.style.maxHeight === '60px') {
+                        desc.style.maxHeight = desc.scrollHeight + 'px';
+                        desc.style.overflow = 'visible';
+                        btn.textContent = 'Show less';
+                    } else {
+                        desc.style.maxHeight = '60px';
+                        desc.style.overflow = 'hidden';
+                        btn.textContent = 'Show more';
+                    }
+                } else {
+                    // Tutup semua card lain
+                    desc.style.maxHeight = '60px';
+                    desc.style.overflow = 'hidden';
+                    const otherId = desc.id.replace('desc-', '');
+                    const otherBtn = document.getElementById('btn-desc-' + otherId);
+                    if (otherBtn) otherBtn.textContent = 'Show more';
+                }
+            });
         }
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('[id^="desc-"]').forEach(function(desc) {
+                desc.style.maxHeight = '60px';
+                desc.style.overflow = 'hidden';
+            });
+        });
     </script>
     <style>
         .sidebar-anim-hover {

@@ -28,7 +28,8 @@
                     <thead class="bg-gradient-to-r from-yellow-200 to-yellow-400">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-bold text-yellow-800 uppercase tracking-wider">
-                                <input type="checkbox" id="select-all"></th>
+                                <input type="checkbox" id="select-all">
+                            </th>
                             <th class="px-4 py-3 text-left text-xs font-bold text-yellow-800 uppercase tracking-wider">Menu
                             </th>
                             <th class="px-4 py-3 text-left text-xs font-bold text-yellow-800 uppercase tracking-wider">Harga
@@ -44,12 +45,12 @@
                         @foreach ($menus as $menu)
                             @php
                                 $subtotal = $menu->price * $cart[$menu->id];
-                                $total += $subtotal;
                             @endphp
                             <tr class="hover:bg-yellow-50 transition">
                                 <td class="px-4 py-3 text-center align-middle">
                                     <input type="checkbox" name="selected[]" value="{{ $menu->id }}"
-                                        class="item-checkbox rounded border-yellow-400 focus:ring-yellow-500">
+                                        class="item-checkbox rounded border-yellow-400 focus:ring-yellow-500"
+                                        data-price="{{ $menu->price }}" data-qty="{{ $cart[$menu->id] }}">
                                 </td>
                                 <td class="px-4 py-3 flex items-center gap-3 align-middle">
                                     @if ($menu->image)
@@ -74,8 +75,7 @@
                     <tfoot>
                         <tr class="bg-yellow-100">
                             <td colspan="4" class="px-4 py-3 text-right font-bold text-lg text-yellow-800">Total</td>
-                            <td class="px-4 py-3 font-extrabold text-yellow-900 text-lg" id="cart-total">Rp
-                                {{ number_format($total, 0, ',', '.') }}</td>
+                            <td class="px-4 py-3 font-extrabold text-yellow-900 text-lg" id="cart-total">Rp 0</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -187,29 +187,30 @@
 
 @section('scripts')
     <script>
-        // Hapus duplikasi fungsi updateCartQty, gunakan satu saja di bawah ini
-        function updateCartQty(menuId) {
-            const qty = document.getElementById('qty-' + menuId).value;
-            fetch(`{{ url('/cart/update/') }}/${menuId}`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `qty=${qty}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Update subtotal dan total tanpa reload
-                        const subtotalCell = document.querySelector(`#subtotal-${menuId}`);
-                        if (subtotalCell) {
-                            subtotalCell.textContent = data.subtotal;
-                        }
-                        document.getElementById('cart-total').textContent = data.total;
+        document.addEventListener('DOMContentLoaded', function() {
+            function updateCartTotal() {
+                let total = 0;
+                document.querySelectorAll('.item-checkbox').forEach(cb => {
+                    const qtyInput = document.getElementById('qty-' + cb.value);
+                    let qty = qtyInput ? parseInt(qtyInput.value) : 1;
+                    if (isNaN(qty) || qty < 1) qty = 1;
+                    const price = parseInt(cb.getAttribute('data-price'));
+                    if (cb.checked) {
+                        total += price * qty;
                     }
                 });
-        }
+                document.getElementById('cart-total').textContent = 'Rp ' + total.toLocaleString('id-ID');
+            }
+
+            document.querySelectorAll('.item-checkbox').forEach(cb => {
+                cb.addEventListener('change', updateCartTotal);
+            });
+            document.querySelectorAll('.qty-input').forEach(input => {
+                input.addEventListener('change', updateCartTotal);
+                input.addEventListener('input', updateCartTotal);
+            });
+            updateCartTotal();
+        });
     </script>
     <style>
         @media (max-width: 640px) {

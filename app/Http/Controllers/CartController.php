@@ -100,8 +100,7 @@ class CartController extends Controller
     public function processCheckout(Request $request)
     {
         $user = Auth::user();
-        // Simpan alamat ke user jika berubah
-        if ($request->address && $user->address !== $request->address) {
+        if ($user && $user instanceof \App\Models\User && $request->address && $user->address !== $request->address) {
             $user->address = $request->address;
             $user->save();
         }
@@ -140,6 +139,10 @@ class CartController extends Controller
             'va_number' => isset($order->va_number) ? $order->va_number : null,
             'total' => $total,
         ]);
+        // Simpan tanggal pengiriman sebagai timestamp (jika ada)
+        if ($request->filled('delivery_date')) {
+            $order->delivery_date = $request->input('delivery_date') . ' 00:00:00';
+        }
         // Jika virtual account (transfer), integrasi ke API BNI
         if ($request->payment === 'transfer') {
             $bniResponse = $this->createBniVa($order);
@@ -148,6 +151,40 @@ class CartController extends Controller
             } else {
                 return back()->with('error', 'Gagal membuat Virtual Account BNI.');
             }
+        }
+        // Integrasi Midtrans Snap
+        if ($request->payment === 'midtrans') {
+            \Midtrans\Config::$serverKey = config('midtrans.server_key');
+            \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
+            \Midtrans\Config::$isSanitized = true;
+            \Midtrans\Config::$is3ds = true;
+
+            $snapParams = [
+                'transaction_details' => [
+                    'order_id' => 'ORDER-' . uniqid() . '-' . time(),
+                    'gross_amount' => $total,
+                ],
+                'customer_details' => [
+                    'first_name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone ?? '',
+                    'address' => $request->address,
+                ],
+                'item_details' => array_map(function ($item) {
+                    return [
+                        'id' => $item['menu_id'],
+                        'price' => $item['price'],
+                        'quantity' => $item['qty'],
+                        'name' => $item['name'],
+                    ];
+                }, $items),
+            ];
+            $snapToken = \Midtrans\Snap::getSnapToken($snapParams);
+            $order->payment_detail = json_encode([
+                'payment' => 'midtrans',
+                'snap_token' => $snapToken,
+                'total' => $total,
+            ]);
         }
         $order->save();
         // Kirim notifikasi ke admin
@@ -162,6 +199,10 @@ class CartController extends Controller
         // Redirect ke halaman instruksi VA jika transfer
         if ($request->payment === 'transfer') {
             return redirect()->route('checkout.bni_va', ['order' => $order->id]);
+        }
+        // Redirect ke halaman Midtrans jika pembayaran Midtrans
+        if ($request->payment === 'midtrans') {
+            return redirect()->route('checkout.midtrans', ['order' => $order->id]);
         }
         return redirect()->route('cart.index')->with('success', 'Pesanan berhasil dibuat!');
     }
@@ -207,6 +248,20 @@ class CartController extends Controller
         return view('order.index', compact('orders'));
     }
 
+    public function showMidtransPayment($orderId)
+    {
+        $order = \App\Models\Order::findOrFail($orderId);
+        $snapToken = null;
+        if ($order->payment === 'midtrans') {
+            $detail = json_decode($order->payment_detail, true);
+            $snapToken = $detail['snap_token'] ?? null;
+        }
+        if (!$snapToken) {
+            return redirect()->route('cart.index')->with('error', 'Token pembayaran tidak ditemukan.');
+        }
+        return view('cart.midtrans', compact('order', 'snapToken'));
+    }
+
     private function syncCartToDatabase($cart)
     {
         $user = Auth::user();
@@ -216,5 +271,53 @@ class CartController extends Controller
                 ['items' => json_encode($cart)]
             );
         }
+    }
+
+    public function midtransNotification(Request $request)
+    {
+        // Konfigurasi Midtrans
+        \Midtrans\Config::$serverKey = config('midtrans.server_key');
+        \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
+        \Midtrans\Config::$isSanitized = true;
+        \Midtrans\Config::$is3ds = true;
+
+        // Ambil data notifikasi dari Midtrans (support JSON/raw body)
+        $data = $request->all();
+        if (empty($data) && $request->getContent()) {
+            $data = json_decode($request->getContent(), true);
+        }
+        \Log::info('Midtrans Notification', $data);
+
+        $orderId = $data['order_id'] ?? null;
+        $transactionStatus = $data['transaction_status'] ?? null;
+        $paymentType = $data['payment_type'] ?? null;
+        $fraudStatus = $data['fraud_status'] ?? null;
+
+        if (!$orderId) {
+            \Log::error('Midtrans Notification: order_id missing', $data);
+            return response()->json(['message' => 'order_id missing'], 200);
+        }
+
+        // Cari order berdasarkan order_id di payment_detail atau kolom order_id jika ada
+        $order = \App\Models\Order::where('payment_detail', 'like', '%"order_id":"' . $orderId . '"%')->first();
+        if (!$order && \Schema::hasColumn('orders', 'order_id')) {
+            $order = \App\Models\Order::where('order_id', $orderId)->first();
+        }
+        if (!$order) {
+            \Log::error('Midtrans Notification: Order not found', ['order_id' => $orderId]);
+            return response()->json(['message' => 'Order not found'], 200);
+        }
+
+        // Update status order sesuai status dari Midtrans
+        if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
+            $order->status = 'done';
+        } elseif ($transactionStatus === 'pending') {
+            $order->status = 'pending';
+        } elseif (in_array($transactionStatus, ['deny', 'expire', 'cancel'])) {
+            $order->status = 'canceled';
+        }
+        $order->save();
+        \Log::info('Midtrans Notification: Order updated', ['order_id' => $orderId, 'status' => $order->status]);
+        return response()->json(['message' => 'Notification processed'], 200);
     }
 }

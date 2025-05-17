@@ -16,4 +16,12 @@ class ListOrders extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+
+    // Tampilkan widget statistik order di atas tabel
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\OrderResource\Widgets\OrderStatusChart::class,
+        ];
+    }
 }
