@@ -141,6 +141,7 @@ Akses aplikasi di http://127.0.0.1:8000
 
 -   Untuk menambah data lain, edit/tambah file seeder di `database/seeders/` lalu jalankan `php artisan db:seed`.
 -   Untuk pengembangan, gunakan branch terpisah dan pull request.
+-   Untuk Pembelian Menggunakan Midtrans masi ada kendala
 
 ---
 
