@@ -20,6 +20,14 @@ return new class extends Migration
             $table->dateTime('end_date');
             $table->timestamps();
         });
+
+        // Pivot table promo_menu
+        Schema::create('menu_promo', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('promo_id')->constrained('promos')->onDelete('cascade');
+            $table->foreignId('menu_id')->constrained('menus')->onDelete('cascade');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -27,6 +35,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('menu_promo');
         Schema::dropIfExists('promos');
     }
 };

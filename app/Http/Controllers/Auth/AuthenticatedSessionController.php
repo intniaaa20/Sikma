@@ -34,7 +34,7 @@ class AuthenticatedSessionController extends Controller
             session(['cart' => $cart->items]);
         }
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended('/');
     }
 
     /**

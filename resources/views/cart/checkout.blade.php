@@ -126,10 +126,8 @@
                     required>
                     <option value="">Pilih metode pembayaran</option>
                     <option value="cod" {{ old('payment') == 'cod' ? 'selected' : '' }}>Bayar di Tempat (COD)</option>
-                    <option value="transfer" {{ old('payment') == 'transfer' ? 'selected' : '' }}>Virtual Account</option>
-                    <option value="qris" {{ old('payment') == 'qris' ? 'selected' : '' }}>QRIS</option>
-                    <option value="midtrans" {{ old('payment') == 'midtrans' ? 'selected' : '' }}>Midtrans
-                        (Kartu/KlikBCA/QRIS/dll)</option>
+                    <option value="midtrans" {{ old('payment') == 'midtrans' ? 'selected' : '' }}>Kartu/KlikBCA/QRIS/dll
+                    </option>
                 </select>
 
             </div>
@@ -148,22 +146,39 @@
                 </h2>
                 <div class="bg-yellow-50 rounded-xl p-4 shadow-inner">
                     <ul class="mb-2 divide-y divide-yellow-100">
-                        @php $total = 0; @endphp
-                        @foreach ($menus as $menu)
-                            @if (in_array($menu->id, (array) $selected))
-                                @php
-                                    $subtotal = $menu->price * $cart[$menu->id];
-                                    $total += $subtotal;
-                                @endphp
-                                <li class="flex justify-between py-2">
-                                    <span class="text-gray-700">{{ $menu->name }} <span class="text-xs text-gray-400">x
-                                            {{ $cart[$menu->id] }}</span></span>
-                                    <span class="font-semibold text-yellow-700">Rp
-                                        {{ number_format($subtotal, 0, ',', '.') }}</span>
-                                </li>
-                            @endif
-                        @endforeach
+                        @php
+                            $total = 0;
+                            // Ringkasan bundle
+                            if (isset($appliedPromo) && $appliedPromo && isset($promoMenuIds) && count($promoMenuIds)) {
+                                $bundleLabel = [];
+                                foreach ($promoMenuIds as $mid) {
+                                    $menu = $menus->where('id', $mid)->first();
+                                    $qty = is_array($cart[$mid]) ? $cart[$mid]['qty'] ?? 1 : $cart[$mid];
+                                    $bundleLabel[] = $qty . 'x ' . ($menu ? $menu->name : '');
+                                }
+                                // Gunakan bundleSubtotal dari controller (sudah harga final setelah diskon)
+                                $total += $bundleSubtotal;
+                        @endphp
+                            <li class="flex justify-between py-2 bg-yellow-50">
+                                <span class="text-gray-700 font-bold">Promo Bundle: {{ $appliedPromo->title }} x {{ $promoQty }} <span class="text-xs text-gray-500 ml-2">({{ implode(' + ', $bundleLabel) }})</span></span>
+                                <span class="font-semibold text-green-700">Rp {{ number_format(($bundleSubtotal), 0, ',', '.') }}</span>
+                            </li>
+                        @php }
+                        // Item non-bundle
+                        foreach ($menus as $menu) {
+                            if (isset($promoMenuIds) && in_array($menu->id, $promoMenuIds)) continue;
+                            $qty = is_array($cart[$menu->id]) ? $cart[$menu->id]['qty'] ?? 1 : $cart[$menu->id];
+                            $subtotal = $menu->price * $qty;
+                            $total += $subtotal;
+                        @endphp
+                            <li class="flex justify-between py-2">
+                                <span class="text-gray-700">{{ $menu->name }} <span class="text-xs text-gray-400">x {{ $qty }}</span></span>
+                                <span class="font-semibold text-yellow-700">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                            </li>
+                        @php }
+                        @endphp
                     </ul>
+                    {{-- Sudah ditampilkan harga final bundle di atas, tidak perlu baris diskon terpisah --}}
                     <div class="flex justify-between font-bold border-t pt-3 text-lg">
                         <span>Total</span>
                         <span class="text-yellow-900 animate-pulse">Rp {{ number_format($total, 0, ',', '.') }}</span>

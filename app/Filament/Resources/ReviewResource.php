@@ -26,8 +26,10 @@ class ReviewResource extends Resource
                 Forms\Components\TextInput::make('order_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('rating')
+                Forms\Components\TextInput::make('menu_id')
                     ->required()
+                    ->numeric(),
+                Forms\Components\TextInput::make('rating')
                     ->numeric(),
                 Forms\Components\Textarea::make('comment')
                     ->columnSpanFull(),
@@ -43,6 +45,9 @@ class ReviewResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('order_id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('menu_id')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('rating')

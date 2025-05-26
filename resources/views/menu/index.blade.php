@@ -61,7 +61,32 @@
                         onclick="toggleDesc({{ $menu->id }})" id="btn-desc-{{ $menu->id }}">Show more</button>
                 @endif
                 <div class="flex items-center justify-between mt-auto">
-                    <span class="text-primary font-bold">Rp {{ number_format($menu->price, 0, ',', '.') }}</span>
+                    <span class="text-primary font-bold">
+                        Rp {{ number_format($menu->price, 0, ',', '.') }}
+                        @php
+                            // Hitung harga setelah diskon jika ada promo aktif
+                            $activePromo = null;
+                            if ($menu->promos && count($menu->promos)) {
+                                foreach ($menu->promos as $promo) {
+                                    $now = now();
+                                    if (
+                                        $promo->discount > 0 &&
+                                        $promo->start_date <= $now &&
+                                        $promo->end_date >= $now
+                                    ) {
+                                        $activePromo = $promo;
+                                        break;
+                                    }
+                                }
+                            }
+                        @endphp
+                        @if ($activePromo)
+                            <span class="ml-2 text-xs text-gray-500">(Diskon: Rp
+                                {{ number_format($activePromo->discount, 0, ',', '.') }})</span>
+                            <span class="ml-2 text-green-700 font-bold">= Rp
+                                {{ number_format(max($menu->price - $activePromo->discount, 0), 0, ',', '.') }}</span>
+                        @endif
+                    </span>
                     <div class="flex gap-2">
                         <a href="{{ route('menu.show', $menu->id) }}"
                             class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 text-yellow-900 shadow-lg border-2 border-yellow-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-400 group"

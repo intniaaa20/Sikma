@@ -42,15 +42,46 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-yellow-100">
                         @php $total = 0; @endphp
-                        @foreach ($menus as $menu)
-                            @php
-                                $subtotal = $menu->price * $cart[$menu->id];
-                            @endphp
+                        @php
+                            $total = 0;
+                            // Tampilkan baris bundle jika ada
+                            if (isset($appliedPromo) && $appliedPromo && isset($promoMenuIds) && count($promoMenuIds)) {
+                                // Hitung subtotal bundle
+                                $bundleLabel = [];
+                                foreach ($promoMenuIds as $mid) {
+                                    $menu = $menus->where('id', $mid)->first();
+                                    $qty = is_array($cart[$mid]) ? $cart[$mid]['qty'] ?? 1 : $cart[$mid];
+                                    $bundleLabel[] = $qty . 'x ' . ($menu ? $menu->name : '');
+                                }
+                                $bundleSubtotal = isset($bundleSubtotal) ? $bundleSubtotal : 0;
+                                $total += $bundleSubtotal;
+                        @endphp
+                            <tr class="bg-yellow-50">
+                                <td class="px-4 py-3 text-center align-middle">
+                                    <input type="checkbox" name="selected[]" value="bundle-{{ $appliedPromo->id }}" class="item-checkbox rounded border-yellow-400 focus:ring-yellow-500" checked data-price="{{ $bundleSubtotal }}" data-qty="{{ $promoQty }}">
+                                </td>
+                                <td class="px-4 py-3 align-middle" colspan="1">
+                                    <span class="font-bold text-yellow-800">Promo Bundle: {{ $appliedPromo->title }}</span>
+                                    <span class="text-xs text-gray-500 ml-2">({{ implode(' + ', $bundleLabel) }})</span>
+                                </td>
+                                <td class="px-4 py-3 text-yellow-700 font-bold align-middle">-</td>
+                                <td class="px-4 py-3 align-middle text-center font-bold">x {{ $promoQty }}</td>
+                                <td class="px-4 py-3 font-bold text-green-700 align-middle">Rp {{ number_format($bundleSubtotal, 0, ',', '.') }}</td>
+                            </tr>
+                        @php
+                            }
+                            // Tampilkan item non-bundle
+                            foreach ($menus as $menu) {
+                                if (isset($promoMenuIds) && in_array($menu->id, $promoMenuIds)) continue;
+                                $qty = is_array($cart[$menu->id]) ? $cart[$menu->id]['qty'] ?? 1 : $cart[$menu->id];
+                                $subtotal = $menu->price * $qty;
+                                $total += $subtotal;
+                        @endphp
                             <tr class="hover:bg-yellow-50 transition">
                                 <td class="px-4 py-3 text-center align-middle">
                                     <input type="checkbox" name="selected[]" value="{{ $menu->id }}"
                                         class="item-checkbox rounded border-yellow-400 focus:ring-yellow-500"
-                                        data-price="{{ $menu->price }}" data-qty="{{ $cart[$menu->id] }}">
+                                        data-price="{{ $menu->price }}" data-qty="{{ $qty }}">
                                 </td>
                                 <td class="px-4 py-3 flex items-center gap-3 align-middle">
                                     @if ($menu->image)
@@ -59,23 +90,26 @@
                                     @endif
                                     <span class="font-semibold text-gray-800">{{ $menu->name }}</span>
                                 </td>
-                                <td class="px-4 py-3 text-yellow-700 font-bold align-middle">Rp
-                                    {{ number_format($menu->price, 0, ',', '.') }}</td>
+                                <td class="px-4 py-3 text-yellow-700 font-bold align-middle">
+                                    Rp {{ number_format($menu->price, 0, ',', '.') }}
+                                </td>
                                 <td class="px-4 py-3 align-middle">
                                     <input type="number" name="qty" id="qty-{{ $menu->id }}"
-                                        value="{{ $cart[$menu->id] }}" min="1"
+                                        value="{{ $qty }}" min="1"
                                         class="w-20 border-2 border-yellow-300 rounded-lg px-3 py-2 text-center font-semibold qty-input focus:ring-2 focus:ring-yellow-400 focus:border-yellow-500 transition"
                                         data-menu-id="{{ $menu->id }}" />
                                 </td>
                                 <td class="px-4 py-3 font-bold text-yellow-700 align-middle"
                                     id="subtotal-{{ $menu->id }}">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
                             </tr>
-                        @endforeach
+                        @php }
+                        @endphp
                     </tbody>
                     <tfoot>
                         <tr class="bg-yellow-100">
                             <td colspan="4" class="px-4 py-3 text-right font-bold text-lg text-yellow-800">Total</td>
-                            <td class="px-4 py-3 font-extrabold text-yellow-900 text-lg" id="cart-total">Rp 0</td>
+                            <td class="px-4 py-3 font-extrabold text-yellow-900 text-lg" id="cart-total">Rp
+                                {{ number_format($total, 0, ',', '.') }}</td>
                         </tr>
                     </tfoot>
                 </table>

@@ -28,12 +28,29 @@ class PromoResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('poster_path')
-                    ->maxLength(255),
+                Forms\Components\FileUpload::make('poster_path')
+                    ->label('Poster/Gambar Promo')
+                    ->image()
+                    ->directory('promo-images')
+                    ->helperText('Upload gambar promosi (jpg/png/webp).'),
                 Forms\Components\DateTimePicker::make('start_date')
                     ->required(),
                 Forms\Components\DateTimePicker::make('end_date')
                     ->required(),
+                Forms\Components\TextInput::make('discount')
+                    ->label('Diskon Promo (Rp)')
+                    ->numeric()
+                    ->minValue(0)
+                    ->helperText('Masukkan nominal diskon (dalam rupiah) yang akan mengurangi total harga menu.'),
+                Forms\Components\Select::make('menus')
+                    ->label('Menu yang Masuk Promo')
+                    ->multiple()
+                    ->relationship('menus', 'name', function ($query) {
+                        return $query->select('menus.id', 'menus.name');
+                    })
+                    ->preload()
+                    ->searchable()
+                    ->helperText('Pilih menu yang ingin dimasukkan ke dalam promo ini.'),
             ]);
     }
 

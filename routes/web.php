@@ -1,5 +1,7 @@
+
 <?php
 
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\CartController;
@@ -7,13 +9,13 @@ use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Menu; // Pastikan Model Menu di-import
 use Spatie\Permission\Middlewares\RoleMiddleware as SpatieRoleMiddleware;
+use App\Http\Controllers\Customer\HomeController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [HomeController::class, 'index']);
 
 // Route untuk menerima notifikasi dari Midtrans (webhook), tidak perlu auth
 Route::post('/midtrans/notification', [CartController::class, 'midtransNotification']);
+
 
 
 Route::middleware('auth')->group(function () {
@@ -48,18 +50,19 @@ Route::middleware('auth')->group(function () {
         return back()->with('success', $menu->name . ' ditambahkan ke keranjang (implementasi menyusul).');
     })->name('cart.add');
 
+    // Route untuk menyimpan review makanan dari histori order
+    Route::post('/review/store', [ReviewController::class, 'store'])->name('review.store');
+
     // Tambahkan route lain yang mungkin diperlukan keranjang nanti (misal: cart.show)
-    Route::middleware('auth')->group(function () {
-        Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-        Route::post('/cart/add/{menu}', [CartController::class, 'add'])->name('cart.add');
-        Route::post('/cart/update/{menu}', [CartController::class, 'update'])->name('cart.update');
-        Route::post('/cart/remove/{menu}', [CartController::class, 'remove'])->name('cart.remove');
-        Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
-        Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
-        Route::post('/checkout/process', [CartController::class, 'processCheckout'])->name('checkout.process');
-        Route::post('/cart/delete-selected', [CartController::class, 'deleteSelected'])->name('cart.deleteSelected');
-        Route::get('/checkout/midtrans/{order}', [CartController::class, 'showMidtransPayment'])->name('checkout.midtrans');
-    });
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add/{menu}', [CartController::class, 'add'])->name('cart.add');
+    Route::post('/cart/update/{menu}', [CartController::class, 'update'])->name('cart.update');
+    Route::post('/cart/remove/{menu}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+    Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+    Route::post('/checkout/process', [CartController::class, 'processCheckout'])->name('checkout.process');
+    Route::post('/cart/delete-selected', [CartController::class, 'deleteSelected'])->name('cart.deleteSelected');
+    Route::get('/checkout/midtrans/{order}', [CartController::class, 'showMidtransPayment'])->name('checkout.midtrans');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/history', [OrderController::class, 'history'])->name('orders.history');
@@ -67,6 +70,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/messages', [\App\Http\Controllers\MessageController::class, 'index'])->name('messages.index');
     Route::post('/messages', [\App\Http\Controllers\MessageController::class, 'store'])->name('messages.store');
 });
+
 
 // Ganti middleware admin dengan pengecekan manual di controller jika 'role' tidak tersedia
 Route::middleware(['auth'])->group(function () {

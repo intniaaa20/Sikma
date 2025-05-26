@@ -3,6 +3,16 @@
 @section('title', 'Histori Pesanan Selesai')
 
 @section('content')
+    @if (session('success'))
+        <div class="mb-4 p-3 rounded bg-green-100 text-green-800 border border-green-300">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="mb-4 p-3 rounded bg-red-100 text-red-800 border border-red-300">
+            {{ session('error') }}
+        </div>
+    @endif
     <h1 class="text-2xl font-bold mb-6">Histori Pesanan Selesai</h1>
     @if ($orders->isEmpty())
         <div class="text-center text-gray-500 py-12">
@@ -35,10 +45,58 @@
                                 {{ number_format($order->total, 0, ',', '.') }}</td>
                             <td class="px-4 py-3">
                                 <ul class="list-disc pl-4 text-gray-700">
-                                    @foreach (json_decode($order->items, true) as $item)
-                                        <li>{{ $item['name'] }} x {{ $item['qty'] }}</li>
+                                    @php
+                                        $items = json_decode($order->items, true);
+                                        $bundle = collect($items)->first(
+                                            fn($i) => str_starts_with($i['menu_id'], 'bundle-'),
+                                        );
+                                    @endphp
+                                    @foreach ($items as $item)
+                                        <li>
+                                            {{ $item['name'] }} x {{ $item['qty'] }}
+                                            @php
+                                                $review = \App\Models\Review::where('order_id', $order->id)
+                                                    ->where('menu_id', $item['menu_id'] ?? null)
+                                                    ->first();
+                                            @endphp
+                                            @if ($review)
+                                                @if ($review->comment)
+                                                    <div class="text-xs text-gray-600 italic mt-1">"{{ $review->comment }}"
+                                                    </div>
+                                                @endif
+                                            @else
+                                                <form action="{{ route('review.store') }}" method="POST"
+                                                    class="mt-2 flex flex-col gap-1">
+                                                    @csrf
+                                                    <input type="hidden" name="order_id" value="{{ $order->id }}">
+                                                    <input type="hidden" name="menu_id"
+                                                        value="{{ $item['menu_id'] ?? ($item['id'] ?? '') }}">
+                                                    <div class="flex items-center gap-2 mt-1">
+                                                        <label for="rating" class="text-xs">Rating:</label>
+                                                        <select name="rating" id="rating"
+                                                            class="border border-yellow-200 rounded px-2 py-1 text-xs"
+                                                            required>
+                                                            <option value="">Pilih rating</option>
+                                                            @for ($i = 1; $i <= 10; $i++)
+                                                                <option value="{{ $i }}">{{ $i }}
+                                                                </option>
+                                                            @endfor
+                                                        </select>
+                                                    </div>
+                                                    <textarea name="comment" rows="1" class="w-full border border-yellow-200 rounded px-2 py-1 text-xs mt-1"
+                                                        placeholder="Tulis komentar..." required></textarea>
+                                                    <button type="submit"
+                                                        class="text-xs bg-yellow-400 hover:bg-yellow-500 text-white rounded px-2 py-1 mt-1">Kirim
+                                                        Review</button>
+                                                </form>
+                                            @endif
+                                        </li>
                                     @endforeach
                                 </ul>
+                                @if ($bundle)
+                                    <div class="mt-2 text-sm text-green-700 font-bold">Promo Bundle: Sudah termasuk diskon
+                                    </div>
+                                @endif
                                 <div class="mt-2 text-xs text-gray-500">
                                     <div><b>Alamat:</b> {{ $order->address }}</div>
                                     <div><b>Catatan:</b> {{ $order->note }}</div>

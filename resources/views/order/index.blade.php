@@ -56,12 +56,39 @@
                             <td colspan="5" class="bg-yellow-50 px-4 py-4">
                                 <div class="font-semibold mb-2">Detail Pesanan:</div>
                                 <ul class="list-disc pl-6 text-gray-700">
-                                    @foreach (json_decode($order->items, true) as $item)
+                                    @php
+                                        $items = json_decode($order->items, true);
+                                        $bundle = collect($items)->first(
+                                            fn($i) => str_starts_with($i['menu_id'], 'bundle-'),
+                                        );
+                                        $totalNormal = 0;
+                                        $diskonBundle = 0;
+                                        if ($bundle) {
+                                            // Hitung total normal bundle
+                                            $bundleMenus = [];
+                                            if (isset($order->payment_detail)) {
+                                                $pd = json_decode($order->payment_detail, true);
+                                                $bundleMenus = $pd['bundle_menu'] ?? [];
+                                                $bundleDiscount = $pd['bundle_discount'] ?? 0;
+                                            }
+                                            foreach ($items as $item) {
+                                                if (isset($item['menu_id']) && is_numeric($item['menu_id'])) {
+                                                    $totalNormal += $item['price'] * $item['qty'];
+                                                }
+                                            }
+                                            $diskonBundle = $totalNormal + $bundle['price'] - $order->total;
+                                        }
+                                    @endphp
+                                    @foreach ($items as $item)
                                         <li>{{ $item['name'] }} x {{ $item['qty'] }} <span
                                                 class="text-xs text-gray-400">(Rp
                                                 {{ number_format($item['price'], 0, ',', '.') }})</span></li>
                                     @endforeach
                                 </ul>
+                                @if ($bundle)
+                                    <div class="mt-2 text-sm text-green-700 font-bold">Promo Bundle: Sudah termasuk diskon
+                                    </div>
+                                @endif
                                 <div class="mt-2 text-sm text-gray-500">Alamat: {{ $order->address }}</div>
                                 <div class="text-sm text-gray-500">Catatan: {{ $order->note }}</div>
                                 <div class="text-sm text-gray-500">Pengiriman: {{ ucfirst($order->delivery) }}</div>

@@ -41,6 +41,9 @@ class MenuResource extends Resource
                     ->prefix('Rp'),
                 Forms\Components\Toggle::make('is_available')
                     ->required(),
+                Forms\Components\Toggle::make('is_today')
+                    ->label('Menu Hari Ini')
+                    ->helperText('Aktifkan jika menu ini adalah menu hari ini.'),
                 Forms\Components\FileUpload::make('image')
                     ->image()
                     ->directory('menu-images'),
@@ -57,6 +60,9 @@ class MenuResource extends Resource
                     ->money('IDR')
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_available')
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('is_today')
+                    ->label('Menu Hari Ini')
                     ->boolean(),
                 Tables\Columns\ImageColumn::make('image'),
                 Tables\Columns\TextColumn::make('description')
