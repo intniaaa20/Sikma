@@ -9,7 +9,7 @@ Sistem aplikasi Laravel untuk pemesanan makanan, pengelolaan menu, promo bundle,
 ### 1. Clone & Install Dependency
 
 ```powershell
-git clone <repo-anda>
+git clone https://github.com/intniaaa20/Sikma.git
 cd Sikma
 composer install
 npm install
