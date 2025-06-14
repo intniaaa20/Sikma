@@ -35,21 +35,27 @@ php artisan key:generate
 php artisan migrate
 ```
 
-### 5. Jalankan Seeder (User, Menu, Promo, dst)
+### 5. Jalankan Filament
 
 ```powershell
-php artisan db:seed
+composer require filament/filament:"^3.3" -W
+
+php artisan filament:install --panels
+```
+( **Jika ada error, hapus terlebih dahulu AdminPanelProvider.php di app/Providers/Filament/AdminPanelProvider.php** )
+
+### 6. Jalankan Untuk menambahkan admin
+```powershell
+php artisan make:filament-user
 ```
 
-Seeder akan otomatis mengisi data contoh user, menu, dan promo bundle.
-
-### 6. Compile Asset Frontend (Vite)
+### 7. Compile Asset Frontend (Vite)
 
 ```powershell
 npm run dev
 ```
 
-### 7. Jalankan Server Laravel
+### 8. Jalankan Server Laravel
 
 ```powershell
 php artisan serve

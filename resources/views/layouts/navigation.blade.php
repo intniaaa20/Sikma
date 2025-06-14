@@ -12,9 +12,36 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+                    @if (Auth::user()?->hasRole('admin'))
+                        <x-nav-link :href="url('/admin')" :active="request()->is('admin')">
+                            {{ __('Admin') }}
+                        </x-nav-link>
+                        <x-nav-link :href="url('/menu')" :active="request()->is('menu')">
+                            {{ __('Menu') }}
+                        </x-nav-link>
+                        <x-nav-link :href="url('/product')" :active="request()->is('product')">
+                            {{ __('Product') }}
+                        </x-nav-link>
+                        <x-nav-link :href="url('/chat')" :active="request()->is('chat')">
+                            {{ __('Chat') }}
+                        </x-nav-link>
+                    @else
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                        <x-nav-link :href="url('/cart')" :active="request()->is('cart')">
+                            {{ __('Cart') }}
+                        </x-nav-link>
+                        <x-nav-link :href="url('/order')" :active="request()->is('order')">
+                            {{ __('Order') }}
+                        </x-nav-link>
+                        <x-nav-link :href="url('/history')" :active="request()->is('history')">
+                            {{ __('History') }}
+                        </x-nav-link>
+                        <x-nav-link :href="url('/chat')" :active="request()->is('chat')">
+                            {{ __('Chat') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 

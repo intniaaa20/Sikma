@@ -23,7 +23,7 @@
             @if ($users)
                 <div class="w-1/3 border-r pr-4">
                     <h2 class="font-semibold mb-2 text-yellow-700">
-                        @if (auth()->user()->role === 'admin')
+                        @if (auth()->user()->hasRole('admin'))
                             Pilih Customer
                         @else
                             Pilih Admin

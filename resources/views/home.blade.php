@@ -23,28 +23,14 @@
                             <span class="text-xs text-gray-500">Menu Promo:</span>
                             <ul class="list-disc pl-4">
                                 @php
-                                    // Contoh: Esteh (qty 2) + Ayam Ganja (qty 1)
-                                    $items = [
-                                        [
-                                            'name' => 'Ayam Ganja',
-                                            'qty' => 1,
-                                            'price' => null,
-                                        ],
-                                        [
-                                            'name' => 'Es Teh',
-                                            'qty' => 1,
-                                            'price' => null,
-                                        ],
-                                    ];
-                                    // Ambil harga dari relasi menu promo
+                                    $items = [];
                                     foreach ($promo->menus as $menu) {
-                                        foreach ($items as &$item) {
-                                            if (strtolower($menu->name) === strtolower($item['name'])) {
-                                                $item['price'] = $menu->price;
-                                            }
-                                        }
+                                        $items[] = [
+                                            'name' => $menu->name,
+                                            'qty' => 1, // Atur qty sesuai kebutuhan jika ada info qty di relasi
+                                            'price' => $menu->price,
+                                        ];
                                     }
-                                    unset($item);
                                     $total = 0;
                                     $label = [];
                                     foreach ($items as $item) {
@@ -58,11 +44,8 @@
                                 <li class="text-xs text-yellow-700 font-semibold flex flex-col gap-1">
                                     <span>{{ implode(' + ', $label) }}</span>
                                     @if ($promo->discount > 0 && $total > 0)
-                                        <span class="text-xs text-gray-500">(Rp
-                                            {{ isset($items[0]['price']) && $items[0]['price'] !== null ? number_format($items[0]['price'], 0, ',', '.') : '0' }}
-                                            + Rp
-                                            {{ isset($items[1]['price']) && $items[1]['price'] !== null ? number_format($items[1]['price'], 0, ',', '.') : '0' }}
-                                            ) - Diskon: Rp {{ number_format($promo->discount, 0, ',', '.') }}</span>
+                                        <span class="text-xs text-gray-500">(Rp {{ number_format($total, 0, ',', '.') }}) -
+                                            Diskon: Rp {{ number_format($promo->discount, 0, ',', '.') }}</span>
                                         <span class="text-green-700 font-bold text-sm">= Rp
                                             {{ number_format($final, 0, ',', '.') }}</span>
                                     @elseif ($total > 0)
@@ -96,7 +79,7 @@
         </div>
     @endif
 
-    <h1 class="text-xl font-bold mb-6">Menu Hari Ini</h1>
+    <h1 class="text-xl font-bold mb-6">Menu Hari ini</h1>
     @if (isset($menusToday) && $menusToday->count())
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
             @foreach ($menusToday as $menu)
@@ -134,6 +117,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
+
                             </a>
                             @if (!auth()->user() || !auth()->user()->hasRole('admin'))
                                 <form action="{{ route('cart.add', ['menu' => $menu->id]) }}" method="POST">
@@ -253,45 +237,27 @@
             document.querySelectorAll('.btn-promo-cart').forEach(function(btn) {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const menuIds = this.dataset.menuIds.split(',');
                     const promoId = this.dataset.promoId;
-                    const promoDiscount = this.dataset.promoDiscount;
-                    let added = 0;
-                    let failed = 0;
-                    let done = 0;
-                    menuIds.forEach(menuId => {
-                        fetch(`/cart/add/${menuId}`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                    promo_id: promoId,
-                                    promo_discount: promoDiscount
-                                })
-                            })
-                            .then(res => {
-                                done++;
-                                if (res.ok) {
-                                    added++;
+                    fetch(`/cart/add-promo/${promoId}`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.cartCount !== undefined) {
+                                if (typeof updateSidebarCartBadge === 'function') {
+                                    updateSidebarCartBadge(data.cartCount);
                                 } else {
-                                    failed++;
+                                    window.location.reload();
                                 }
-                                if (done === menuIds.length) {
-                                    if (added > 0) {
-                                        alert(
-                                            'Menu promo berhasil ditambahkan ke keranjang!'
-                                            );
-                                        location.reload();
-                                    } else {
-                                        alert(
-                                            'Gagal menambah menu promo ke keranjang.'
-                                            );
-                                    }
-                                }
-                            });
-                    });
+                            } else {
+                                window.location.reload();
+                            }
+                        })
+                        .catch(() => window.location.reload());
                 });
             });
         });

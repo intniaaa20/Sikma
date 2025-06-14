@@ -29,7 +29,11 @@ class HomeController extends Controller
 
         // Urutkan menu berdasarkan jumlah pesanan terbanyak dan ambil limit (misal 8 teratas)
         arsort($menuCounts);
-        $favoriteMenuIds = array_slice(array_keys($menuCounts), 0, 8);
+        // Filter hanya menu_id numerik (bukan promo_X/bundle_X) untuk favorit
+        $favoriteMenuIds = array_filter(array_keys($menuCounts), function($id) {
+            return is_numeric($id);
+        });
+        $favoriteMenuIds = array_slice($favoriteMenuIds, 0, 8);
         $favoriteMenus = Menu::whereIn('id', $favoriteMenuIds)
             ->get()
             ->sortByDesc(function ($menu) use ($menuCounts) {

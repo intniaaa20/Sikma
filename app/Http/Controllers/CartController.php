@@ -23,7 +23,11 @@ class CartController extends Controller
     {
         $cart = session()->get('cart', []);
         $cart = is_array($cart) ? $cart : [];
-        $menus = \App\Models\Menu::whereIn('id', array_keys($cart))->with('promos')->get();
+        // Ambil hanya key numerik untuk menu biasa
+        $menuIds = array_filter(array_keys($cart), function ($k) {
+            return is_numeric($k);
+        });
+        $menus = \App\Models\Menu::whereIn('id', $menuIds)->with('promos')->get();
 
         // --- PROMO BUNDLE LOGIC ---
         // Ambil semua promo aktif yang punya menu di cart
@@ -127,7 +131,56 @@ class CartController extends Controller
         }
         session(['cart' => $cart]);
         $this->syncCartToDatabase($cart);
+
+        // Hitung total qty cart
+        $cartCount = 0;
+        foreach ($cart as $item) {
+            if (is_array($item) && isset($item['qty'])) {
+                $cartCount += $item['qty'];
+            } elseif (is_numeric($item)) {
+                $cartCount += $item;
+            }
+        }
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'cartCount' => $cartCount,
+            ]);
+        }
         return back()->with('success', 'Menu berhasil ditambahkan ke keranjang!');
+    }
+
+    public function addPromo(Request $request, $promoId)
+    {
+        $promo = \App\Models\Promo::with('menus')->findOrFail($promoId);
+        $cart = session()->get('cart', []);
+        $key = 'promo_' . $promo->id;
+        // Tambahkan/tingkatkan qty paket promo
+        if (isset($cart[$key])) {
+            $cart[$key]['qty'] += 1;
+        } else {
+            $cart[$key] = [
+                'qty' => 1,
+                'promo_id' => $promo->id,
+                'promo_discount' => $promo->discount,
+                'menu_ids' => $promo->menus->pluck('id')->toArray(),
+                'label' => $promo->title,
+            ];
+        }
+        session(['cart' => $cart]);
+        // Hitung total item (qty semua paket + item lain)
+        $cartCount = 0;
+        foreach ($cart as $item) {
+            $cartCount += isset($item['qty']) ? $item['qty'] : 1;
+        }
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'cartCount' => $cartCount,
+            ]);
+        }
+        return back()->with('success', 'Paket promo berhasil ditambahkan ke keranjang!');
     }
 
     public function remove(Request $request, Menu $menu)
@@ -281,83 +334,42 @@ class CartController extends Controller
             $cart = [];
         }
         $selected = $request->input('selected', array_keys($cart));
-        $menus = Menu::whereIn('id', $selected)->get();
+        // Pisahkan id menu dan promo bundle
+        $menuIds = array_filter($selected, function ($id) {
+            return is_numeric($id);
+        });
+        $promoKeys = array_filter($selected, function ($id) {
+            return is_string($id) && strpos($id, 'promo_') === 0;
+        });
+        $menus = Menu::whereIn('id', $menuIds)->get();
         $total = 0;
         $items = [];
-        // --- PROMO BUNDLE LOGIC (copy dari checkout) ---
-        $today = now();
-        $promoBundles = \App\Models\Promo::with('menus')
-            ->where('start_date', '<=', $today)
-            ->where('end_date', '>=', $today)
-            ->get();
-        $appliedPromo = null;
-        $promoMenuIds = [];
-        $promoDiscount = 0;
-        $promoQty = 0;
-        // Cek apakah user memilih bundle row (checkbox value: bundle-<id>)
-        $selectedBundleId = null;
-        foreach ($selected as $sel) {
-            if (is_string($sel) && strpos($sel, 'bundle-') === 0) {
-                $selectedBundleId = (int)str_replace('bundle-', '', $sel);
-                break;
-            }
-        }
-        foreach ($promoBundles as $promo) {
-            if ($selectedBundleId !== null && $promo->id !== $selectedBundleId) {
-                continue;
-            }
-            $menuIds = $promo->menus->pluck('id')->map(fn($id) => (string)$id)->toArray();
-            $allInCart = true;
-            $minQty = PHP_INT_MAX;
-            foreach ($menuIds as $mid) {
-                if (!isset($cart[$mid]) || (is_array($cart[$mid]) && (!isset($cart[$mid]['qty']) || $cart[$mid]['qty'] < 1)) || (!is_array($cart[$mid]) && $cart[$mid] < 1)) {
-                    $allInCart = false;
-                    break;
+        // Tambahkan item promo bundle
+        foreach ($promoKeys as $promoKey) {
+            $promoItem = $cart[$promoKey] ?? null;
+            if ($promoItem && isset($promoItem['promo_id'])) {
+                $promo = \App\Models\Promo::with('menus')->find($promoItem['promo_id']);
+                $promoMenus = $promo ? $promo->menus : collect();
+                $bundleLabel = [];
+                $promoQty = $promoItem['qty'] ?? 1;
+                $bundlePrice = 0;
+                foreach ($promoMenus as $pmenu) {
+                    $bundleLabel[] = $promoQty . 'x ' . $pmenu->name;
+                    $bundlePrice += $pmenu->price;
                 }
-                $qtyVal = is_array($cart[$mid]) ? ($cart[$mid]['qty'] ?? 1) : $cart[$mid];
-                if (!is_numeric($qtyVal)) $qtyVal = 1;
-                $minQty = min($minQty, $qtyVal);
-            }
-            if ($allInCart && $minQty > 0) {
-                $appliedPromo = $promo;
-                $promoMenuIds = $menuIds;
-                $promoDiscount = $promo->discount;
-                $promoQty = (int)$minQty;
-                break;
-            }
-        }
-
-        // Hitung total normal dan diskon bundle
-        $bundlePrice = 0;
-        if ($appliedPromo) {
-            foreach ($promoMenuIds as $mid) {
-                $menu = $menus->where('id', $mid)->first();
-                if ($menu) {
-                    $bundlePrice += $menu->price;
-                }
+                $promoDiscount = $promoItem['promo_discount'] ?? ($promo->discount ?? 0);
+                $bundleSubtotal = max(($bundlePrice * $promoQty) - ($promoDiscount * $promoQty), 0);
+                $items[] = [
+                    'menu_id' => $promoKey,
+                    'name' => 'Promo Bundle: ' . ($promo->title ?? 'Promo'),
+                    'price' => $bundleSubtotal,
+                    'qty' => 1,
+                ];
+                $total += $bundleSubtotal;
             }
         }
-        $bundleSubtotal = 0;
-        if ($appliedPromo && $bundlePrice > 0 && $promoQty > 0) {
-            $bundleSubtotal = max(($bundlePrice * $promoQty) - ($promoDiscount * $promoQty), 0);
-        }
-
-        // Hitung total: bundle + non-bundle
-        $total = 0;
-        $items = [];
-        if ($appliedPromo && $bundleSubtotal > 0) {
-            // Tambahkan satu item bundle summary
-            $items[] = [
-                'menu_id' => 'bundle-' . $appliedPromo->id,
-                'name' => 'Promo Bundle: ' . $appliedPromo->title,
-                'price' => $bundleSubtotal,
-                'qty' => 1,
-            ];
-            $total += $bundleSubtotal;
-        }
-        // Item non-bundle
+        // Tambahkan item menu biasa (TANPA DISKON)
         foreach ($menus as $menu) {
-            if ($appliedPromo && in_array($menu->id, $promoMenuIds)) continue;
             $qty = isset($cart[$menu->id])
                 ? (is_array($cart[$menu->id]) ? ($cart[$menu->id]['qty'] ?? 1) : $cart[$menu->id])
                 : 1;
@@ -365,7 +377,7 @@ class CartController extends Controller
             $items[] = [
                 'menu_id' => $menu->id,
                 'name' => $menu->name,
-                'price' => $menu->price,
+                'price' => $menu->price, // harga asli, tanpa diskon
                 'qty' => $qty,
             ];
             $total += $menu->price * $qty;

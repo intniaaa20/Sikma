@@ -1,4 +1,3 @@
-
 <?php
 
 use App\Http\Controllers\ReviewController;
@@ -10,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Menu; // Pastikan Model Menu di-import
 use Spatie\Permission\Middlewares\RoleMiddleware as SpatieRoleMiddleware;
 use App\Http\Controllers\Customer\HomeController;
+use App\Http\Middleware\CheckAdminRole;
 
 Route::get('/', [HomeController::class, 'index']);
 
@@ -20,6 +20,9 @@ Route::post('/midtrans/notification', [CartController::class, 'midtransNotificat
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
+        if (auth()->user() && auth()->user()->hasRole('admin')) {
+            return redirect('/');
+        }
         return view('dashboard');
     })->middleware(['verified'])->name('dashboard');
 
@@ -76,5 +79,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/order-history', [OrderController::class, 'adminOrderHistory'])->name('admin.order-history');
 });
+
+Route::post('/cart/add-promo/{promo}', [CartController::class, 'addPromo'])->name('cart.addPromo');
 
 require __DIR__ . '/auth.php';

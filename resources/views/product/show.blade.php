@@ -77,14 +77,16 @@
             @if ($menu->is_available && (!auth()->user() || !auth()->user()->hasRole('admin')))
                 <form method="POST" action="{{ route('cart.add', $menu->id) }}" class="flex items-center gap-2">
                     @csrf
-                    <button type="submit"
-                        class="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white px-6 py-2 rounded-full shadow-lg text-base font-bold flex items-center gap-2 transition-all duration-200 focus:ring-2 focus:ring-yellow-400 focus:outline-none active:scale-95">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" class="w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Tambah ke Keranjang
-                    </button>
+                    @if (auth()->user()->hasRole('customer'))
+                        <button type="submit"
+                            class="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white px-6 py-2 rounded-full shadow-lg text-base font-bold flex items-center gap-2 transition-all duration-200 focus:ring-2 focus:ring-yellow-400 focus:outline-none active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Tambah ke Keranjang
+                        </button>
+                    @endif
                 </form>
             @endif
         </div>

@@ -9,7 +9,8 @@
             {{ session('success') }}
         </div> --}}
     @endif
-    @if (count($cart) && $menus->count())
+    @php $hasCart = count($cart); @endphp
+    @if ($hasCart)
         <form method="POST" action="{{ route('cart.clear') }}" class="mb-4 flex justify-end">
             @csrf
             <button type="submit"
@@ -42,68 +43,84 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-yellow-100">
                         @php $total = 0; @endphp
-                        @php
-                            $total = 0;
-                            // Tampilkan baris bundle jika ada
-                            if (isset($appliedPromo) && $appliedPromo && isset($promoMenuIds) && count($promoMenuIds)) {
-                                // Hitung subtotal bundle
-                                $bundleLabel = [];
-                                foreach ($promoMenuIds as $mid) {
-                                    $menu = $menus->where('id', $mid)->first();
-                                    $qty = is_array($cart[$mid]) ? $cart[$mid]['qty'] ?? 1 : $cart[$mid];
-                                    $bundleLabel[] = $qty . 'x ' . ($menu ? $menu->name : '');
-                                }
-                                $bundleSubtotal = isset($bundleSubtotal) ? $bundleSubtotal : 0;
-                                $total += $bundleSubtotal;
-                        @endphp
-                            <tr class="bg-yellow-50">
-                                <td class="px-4 py-3 text-center align-middle">
-                                    <input type="checkbox" name="selected[]" value="bundle-{{ $appliedPromo->id }}" class="item-checkbox rounded border-yellow-400 focus:ring-yellow-500" checked data-price="{{ $bundleSubtotal }}" data-qty="{{ $promoQty }}">
-                                </td>
-                                <td class="px-4 py-3 align-middle" colspan="1">
-                                    <span class="font-bold text-yellow-800">Promo Bundle: {{ $appliedPromo->title }}</span>
-                                    <span class="text-xs text-gray-500 ml-2">({{ implode(' + ', $bundleLabel) }})</span>
-                                </td>
-                                <td class="px-4 py-3 text-yellow-700 font-bold align-middle">-</td>
-                                <td class="px-4 py-3 align-middle text-center font-bold">x {{ $promoQty }}</td>
-                                <td class="px-4 py-3 font-bold text-green-700 align-middle">Rp {{ number_format($bundleSubtotal, 0, ',', '.') }}</td>
-                            </tr>
-                        @php
-                            }
-                            // Tampilkan item non-bundle
-                            foreach ($menus as $menu) {
-                                if (isset($promoMenuIds) && in_array($menu->id, $promoMenuIds)) continue;
-                                $qty = is_array($cart[$menu->id]) ? $cart[$menu->id]['qty'] ?? 1 : $cart[$menu->id];
-                                $subtotal = $menu->price * $qty;
-                                $total += $subtotal;
-                        @endphp
-                            <tr class="hover:bg-yellow-50 transition">
-                                <td class="px-4 py-3 text-center align-middle">
-                                    <input type="checkbox" name="selected[]" value="{{ $menu->id }}"
-                                        class="item-checkbox rounded border-yellow-400 focus:ring-yellow-500"
-                                        data-price="{{ $menu->price }}" data-qty="{{ $qty }}">
-                                </td>
-                                <td class="px-4 py-3 flex items-center gap-3 align-middle">
-                                    @if ($menu->image)
-                                        <img src="{{ url('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
-                                            class="w-14 h-14 object-cover rounded-lg border border-yellow-200 shadow-sm">
-                                    @endif
-                                    <span class="font-semibold text-gray-800">{{ $menu->name }}</span>
-                                </td>
-                                <td class="px-4 py-3 text-yellow-700 font-bold align-middle">
-                                    Rp {{ number_format($menu->price, 0, ',', '.') }}
-                                </td>
-                                <td class="px-4 py-3 align-middle">
-                                    <input type="number" name="qty" id="qty-{{ $menu->id }}"
-                                        value="{{ $qty }}" min="1"
-                                        class="w-20 border-2 border-yellow-300 rounded-lg px-3 py-2 text-center font-semibold qty-input focus:ring-2 focus:ring-yellow-400 focus:border-yellow-500 transition"
-                                        data-menu-id="{{ $menu->id }}" />
-                                </td>
-                                <td class="px-4 py-3 font-bold text-yellow-700 align-middle"
-                                    id="subtotal-{{ $menu->id }}">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
-                            </tr>
-                        @php }
-                        @endphp
+                        @foreach ($cart as $key => $item)
+                            @if (is_numeric($key))
+                                @php
+                                    $menu = $menus->where('id', $key)->first();
+                                    if (!$menu) {
+                                        continue;
+                                    }
+                                    $qty = is_array($item) ? $item['qty'] ?? 1 : $item;
+                                    $subtotal = $menu->price * $qty;
+                                    $total += $subtotal;
+                                @endphp
+                                <tr class="hover:bg-yellow-50 transition">
+                                    <td class="px-4 py-3 text-center align-middle">
+                                        <input type="checkbox" name="selected[]" value="{{ $menu->id }}"
+                                            class="item-checkbox rounded border-yellow-400 focus:ring-yellow-500"
+                                            data-price="{{ $menu->price }}" data-qty="{{ $qty }}">
+                                    </td>
+                                    <td class="px-4 py-3 flex items-center gap-3 align-middle">
+                                        @if ($menu->image)
+                                            <img src="{{ url('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
+                                                class="w-14 h-14 object-cover rounded-lg border border-yellow-200 shadow-sm">
+                                        @endif
+                                        <span class="font-semibold text-gray-800">{{ $menu->name }}</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-yellow-700 font-bold align-middle">
+                                        Rp {{ number_format($menu->price, 0, ',', '.') }}
+                                    </td>
+                                    <td class="px-4 py-3 align-middle">
+                                        <input type="number" name="qty" id="qty-{{ $menu->id }}"
+                                            value="{{ $qty }}" min="1"
+                                            class="w-20 border-2 border-yellow-300 rounded-lg px-3 py-2 text-center font-semibold qty-input focus:ring-2 focus:ring-yellow-400 focus:border-yellow-500 transition"
+                                            data-menu-id="{{ $menu->id }}" />
+                                    </td>
+                                    <td class="px-4 py-3 font-bold text-yellow-700 align-middle"
+                                        id="subtotal-{{ $menu->id }}">Rp {{ number_format($subtotal, 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                            @elseif (Str::startsWith($key, 'promo_'))
+                                @php
+                                    $promoId = (int) Str::after($key, 'promo_');
+                                    $promo =
+                                        isset($appliedPromo) && $appliedPromo && $appliedPromo->id == $promoId
+                                            ? $appliedPromo
+                                            : \App\Models\Promo::with('menus')->find($promoId);
+                                    $promoMenus = $promo ? $promo->menus : collect();
+                                    $bundleLabel = [];
+                                    $promoQty = is_array($item) && isset($item['qty']) ? $item['qty'] : 1;
+                                    $bundlePrice = 0;
+                                    foreach ($promoMenus as $pmenu) {
+                                        $bundleLabel[] = $promoQty . 'x ' . $pmenu->name;
+                                        $bundlePrice += $pmenu->price;
+                                    }
+                                    $promoDiscount =
+                                        is_array($item) && isset($item['promo_discount'])
+                                            ? $item['promo_discount']
+                                            : $promo->discount ?? 0;
+                                    $bundleSubtotal = max($bundlePrice * $promoQty - $promoDiscount * $promoQty, 0);
+                                    $total += $bundleSubtotal;
+                                @endphp
+                                <tr class="bg-yellow-50">
+                                    <td class="px-4 py-3 text-center align-middle">
+                                        <input type="checkbox" name="selected[]" value="promo-{{ $promoId }}"
+                                            class="item-checkbox rounded border-yellow-400 focus:ring-yellow-500" checked
+                                            data-price="{{ $bundleSubtotal }}" data-qty="{{ $promoQty }}">
+                                    </td>
+                                    <td class="px-4 py-3 align-middle" colspan="1">
+                                        <span class="font-bold text-yellow-800">Promo Bundle:
+                                            {{ $promo->title ?? 'Promo' }}</span>
+                                        <span
+                                            class="text-xs text-gray-500 ml-2">({{ implode(' + ', $bundleLabel) }})</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-yellow-700 font-bold align-middle">-</td>
+                                    <td class="px-4 py-3 align-middle text-center font-bold">x {{ $promoQty }}</td>
+                                    <td class="px-4 py-3 font-bold text-green-700 align-middle">Rp
+                                        {{ number_format($bundleSubtotal, 0, ',', '.') }}</td>
+                                </tr>
+                            @endif
+                        @endforeach
                     </tbody>
                     <tfoot>
                         <tr class="bg-yellow-100">

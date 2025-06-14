@@ -17,11 +17,6 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Illuminate\Contracts\View\View;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Middleware\CheckAdminRole;
-
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -35,8 +30,6 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->brandLogo(fn(): View => view('filament.custom-brand'))
-            ->brandLogoHeight('3rem') // Adjust height for the combined element if needed
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -60,7 +53,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-                CheckAdminRole::class,
+                \App\Http\Middleware\DenyCustomerOnFilament::class,
             ]);
     }
 }

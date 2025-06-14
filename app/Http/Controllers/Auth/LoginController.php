@@ -8,8 +8,15 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class LoginController extends Controller
 {
+    use AuthenticatesUsers;
 
-    protected $redirectTo = '/home';
+    protected function redirectTo()
+    {
+        if (auth()->user() && auth()->user()->hasRole('customer')) {
+            return '/';
+        }
+        return '/home';
+    }
 
     public function __construct()
     {

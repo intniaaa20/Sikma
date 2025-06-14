@@ -55,22 +55,25 @@
                                         <li>
                                             {{ $item['name'] }} x {{ $item['qty'] }}
                                             @php
-                                                $review = \App\Models\Review::where('order_id', $order->id)
-                                                    ->where('menu_id', $item['menu_id'] ?? null)
-                                                    ->first();
+                                                $menuId = $item['menu_id'] ?? ($item['id'] ?? '');
+                                                $review = null;
+                                                if (is_numeric($menuId)) {
+                                                    $review = \App\Models\Review::where('order_id', $order->id)
+                                                        ->where('menu_id', $menuId)
+                                                        ->first();
+                                                }
                                             @endphp
                                             @if ($review)
                                                 @if ($review->comment)
                                                     <div class="text-xs text-gray-600 italic mt-1">"{{ $review->comment }}"
                                                     </div>
                                                 @endif
-                                            @else
+                                            @elseif (is_numeric($menuId))
                                                 <form action="{{ route('review.store') }}" method="POST"
                                                     class="mt-2 flex flex-col gap-1">
                                                     @csrf
                                                     <input type="hidden" name="order_id" value="{{ $order->id }}">
-                                                    <input type="hidden" name="menu_id"
-                                                        value="{{ $item['menu_id'] ?? ($item['id'] ?? '') }}">
+                                                    <input type="hidden" name="menu_id" value="{{ $menuId }}">
                                                     <div class="flex items-center gap-2 mt-1">
                                                         <label for="rating" class="text-xs">Rating:</label>
                                                         <select name="rating" id="rating"

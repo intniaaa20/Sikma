@@ -371,6 +371,50 @@
         }
     </style>
     @yield('scripts')
+    <script>
+        // Update badge cart di sidebar setelah tambah ke cart via AJAX
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('form[action*="cart.add"]').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(form);
+                    fetch(form.action, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').getAttribute('content'),
+                                'Accept': 'application/json',
+                            },
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Ambil jumlah cart terbaru dari response atau lakukan fetch ke endpoint cart count
+                            if (data.cartCount !== undefined) {
+                                updateSidebarCartBadge(data.cartCount);
+                            } else {
+                                // fallback: reload
+                                window.location.reload();
+                            }
+                        })
+                        .catch(() => window.location.reload());
+                });
+            });
+        });
+
+        function updateSidebarCartBadge(count) {
+            let badge = document.querySelector('.sidebar-cart-hover .cart-badge');
+            if (!badge) {
+                const cartLink = document.querySelector('.sidebar-cart-hover');
+                badge = document.createElement('span');
+                badge.className =
+                    'cart-badge absolute top-2 right-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5 z-10';
+                cartLink.appendChild(badge);
+            }
+            badge.textContent = count;
+            badge.style.display = count > 0 ? '' : 'none';
+        }
+    </script>
 </body>
 
 </html>
